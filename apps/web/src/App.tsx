@@ -130,20 +130,6 @@ export function App() {
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [agentLoading, setAgentLoading] = useState(true);
 
-  // Live-switch when user picks a different CLI in Settings.
-  useEffect(() => {
-    const onSwitch = (e: Event) => {
-      const id = (e as CustomEvent<string>).detail;
-      void fetchAgents().then((r) => {
-        const next = r.agents.find((a) => a.id === id) ?? null;
-        if (next) setAgent(next);
-      });
-    };
-    window.addEventListener('ogf:preferred-agent-changed', onSwitch as EventListener);
-    return () =>
-      window.removeEventListener('ogf:preferred-agent-changed', onSwitch as EventListener);
-  }, []);
-
   // Per-agent model + reasoning sync effects are declared AFTER the model
   // + reasoning useState (see below) — JS hoists var declarations but not
   // useState values, so the effects need to come later in the function body.
@@ -158,6 +144,35 @@ export function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Live-switch when user picks a different CLI in Settings.
+  useEffect(() => {
+    const onSwitch = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      const activeConv = conversationId
+        ? conversations.find((c) => c.id === conversationId)
+        : null;
+      // Conversation is locked to its original CLI. Settings changes only
+      // decide the default for NEW conversations.
+      if (activeConv && activeConv.agentId !== id) {
+        notify({
+          kind: 'info',
+          title: '默认 CLI 已更新',
+          body: `当前会话固定为 ${activeConv.agentId === 'claude-code' ? 'Claude Code' : 'Codex CLI'}。新建会话后会使用 ${
+            id === 'claude-code' ? 'Claude Code' : 'Codex CLI'
+          }。`,
+        });
+        return;
+      }
+      void fetchAgents().then((r) => {
+        const next = r.agents.find((a) => a.id === id) ?? null;
+        if (next) setAgent(next);
+      });
+    };
+    window.addEventListener('ogf:preferred-agent-changed', onSwitch as EventListener);
+    return () =>
+      window.removeEventListener('ogf:preferred-agent-changed', onSwitch as EventListener);
+  }, [conversationId, conversations, notify]);
 
   // Chat
   const [turns, setTurns] = useState<UiTurn[]>([]);
@@ -963,7 +978,28 @@ export function App() {
 
   async function send(overridePrompt?: string) {
     const text = overridePrompt ?? prompt;
-    if (!agent?.available || !text.trim() || running || !project) return;
+    if (!text.trim() || running || !project) return;
+    if (!agent?.available) {
+      notify({
+        kind: 'error',
+        title: 'CLI 不可用',
+        body: '当前选中的 CLI 未就绪，请在设置中确认安装状态后重试。',
+      });
+      return;
+    }
+    const activeConv = conversationId
+      ? conversations.find((c) => c.id === conversationId)
+      : null;
+    if (activeConv && activeConv.agentId !== agent.id) {
+      notify({
+        kind: 'error',
+        title: '会话 CLI 不匹配',
+        body: `当前会话属于 ${activeConv.agentId === 'claude-code' ? 'Claude Code' : 'Codex CLI'}，请先新建会话，再用 ${
+          agent.id === 'claude-code' ? 'Claude Code' : 'Codex CLI'
+        } 对话。`,
+      });
+      return;
+    }
 
     const userText = text.trim();
     setPrompt('');
