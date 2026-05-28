@@ -3,253 +3,213 @@
 </p>
 
 <p align="center">
-  <b>The local-first, bring-your-own-agent 2D game IDE.</b><br/>
-  Codex or Claude Code drives. Web today, Godot and Unity on the roadmap.
+  <b>本地优先、可自选 AI Agent 的 2D 游戏 IDE。</b><br/>
+  支持 Codex / Claude Code 驱动，当前默认输出 Web（JS + Canvas），Godot 与 Unity 在路线图中。
 </p>
 
 <p align="center">
-  <b>English</b> ·
-  <a href="./README.es.md">Español</a> ·
-  <a href="./README.pt-BR.md">Português (Brasil)</a> ·
-  <a href="./README.de.md">Deutsch</a> ·
-  <a href="./README.fr.md">Français</a> ·
-  <a href="./README.zh-CN.md">简体中文</a> ·
-  <a href="./README.zh-TW.md">繁體中文</a> ·
-  <a href="./README.ko.md">한국어</a> ·
-  <a href="./README.ja.md">日本語</a> ·
-  <a href="./README.ar.md">العربية</a> ·
-  <a href="./README.ru.md">Русский</a> ·
-  <a href="./README.uk.md">Українська</a> ·
-  <a href="./README.tr.md">Türkçe</a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/0x0funky/agent-game-forge/stargazers"><img src="https://img.shields.io/github/stars/0x0funky/agent-game-forge?style=flat" alt="stars"/></a>
+  <a href="https://github.com/tangdan2204/agent-game-forge/stargazers"><img src="https://img.shields.io/github/stars/tangdan2204/agent-game-forge?style=flat" alt="stars"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license"/></a>
   <img src="https://img.shields.io/badge/status-pre--launch-blue" alt="status"/>
   <img src="https://img.shields.io/badge/node-%E2%89%A520-success" alt="node 20+"/>
 </p>
 
 <p align="center">
-  🎨 Sprite pipeline powered by <a href="https://github.com/0x0funky/agent-sprite-forge"><b>agent-sprite-forge</b></a>
+  精灵管线由 <a href="https://github.com/0x0funky/agent-sprite-forge"><b>agent-sprite-forge</b></a> 提供能力支持
 </p>
 
 ---
 
-Agent Game Forge (**AGF**) is an open-source desktop IDE that lets an AI coding agent build complete 2D games for you — sprites, parallax backgrounds, physics, hazards, pickups, scene layouts — and gives you a visual editor to drag-tweak whatever the agent got wrong. **You pick the agent** (Codex CLI or Claude Code) and **you pick the image gen** — bring your own API key, or use Codex CLI's built-in image gen (GPT-Image2). Today the default output is vanilla JS + Canvas (zero framework lock-in, runs in any browser); Godot 4 and Unity engine targets are on the roadmap.
+## 项目简介
+Agent Game Forge（AGF）是一个开源桌面 IDE，用来让 AI 编程 Agent 帮你搭建完整的 2D 游戏：角色精灵、分层背景、物理碰撞、危险区域、可拾取物、场景布局等。
+
+它的核心目标是：
+
+- 你选择 Agent（Codex CLI 或 Claude Code）
+- 你选择图像生成能力（可配置 API Key 或使用内置工具）
+- 你保留最终控制权（可视化场景编辑器可直接拖拽修正）
+
+当前默认生成目标是原生 Web 技术栈（`HTML + JS + Canvas`），无需绑定框架，产物可直接部署到静态托管。
 
 ---
 
-## ✨ At a glance
-
-- 🤖 **Bring your own agent** — Codex CLI or Claude Code. Switch in Settings. Live.
-- 🎨 **Production-grade asset pipeline** — sprite-sheet chroma-key, multi-action animation, parallax 4-layer tileable + despill — all first-class, not bolted on.
-- 🖼️ **Bring your own image gen** — supply an API key for your preferred image provider, or use Codex CLI's built-in image gen (GPT-Image2). Keys stay on your machine.
-- 🧱 **Visual scene editor** — drag platforms, hazards, pickups, colliders; hitbox overlay; live reload to the Play tab.
-- 📦 **Multi-engine on the roadmap** — Web (vanilla JS + Canvas) ships today with zero framework lock-in (push to GitHub Pages, it runs). Godot 4 and Unity targets planned.
-- 💻 **Local-first, open source** — daemon + web UI on `localhost`; your project files stay on your disk; MIT-style intent.
-- 💰 **Cost-transparent** — Settings panel shows today's image-gen call count and estimated $ spend per provider.
+## 核心能力
+- 自选 Agent：Codex CLI / Claude Code，支持在设置中实时切换
+- 生产可用的 2D 资产管线：sprite-sheet、抠图、动画动作组织、分层背景
+- 自选图像生成：按提供方与模型配置调用，密钥仅保存在本机
+- 可视化场景编辑器：拖拽物件、碰撞体、区域、路径，所见即所得
+- 本地优先：Daemon 与 Web UI 在本机运行，项目文件保留在本地磁盘
+- 成本可见：设置页展示图像生成调用统计与费用估算
 
 ---
 
-## 🎬 Demo
-
-**Hero shot** — the AGF window:
+## 界面预览
+主界面：
 
 <p align="center">
-  <img src="apps/web/public/hero-shot.png" alt="AGF main window" width="800" />
+  <img src="apps/web/public/hero-shot.png" alt="AGF 主界面" width="900" />
 </p>
 
-**Settings** — pick your agent + API keys + image-gen defaults:
+设置面板：
 
 <p align="center">
-  <img src="apps/web/public/setting.png" alt="AGF Settings modal" width="800" />
+  <img src="apps/web/public/setting.png" alt="AGF 设置面板" width="900" />
 </p>
 
-**Scene editor** — drag platforms, hazards, pickups, colliders:
+场景编辑器：
 
 <p align="center">
-  <img src="apps/web/public/scene-editor.png" alt="AGF Scene editor" width="800" />
+  <img src="apps/web/public/scene-editor.png" alt="AGF 场景编辑器" width="900" />
 </p>
 
 ---
 
-## 🚀 Quick start
+## 快速开始
+环境要求：
 
-**Requirements**: Node ≥ 20, npm ≥ 10, and **at least one** of:
+- `Node.js >= 20`
+- `npm >= 10`
+- 至少安装一个 Agent CLI：
+- Codex CLI：`npm i -g @openai/codex`
+- Claude Code：`npm i -g @anthropic-ai/claude-code`
 
-- [Codex CLI](https://github.com/openai/codex) — `npm i -g @openai/codex`
-- [Claude Code](https://github.com/anthropics/claude-code) — `npm i -g @anthropic-ai/claude-code`
+安装与启动：
 
 ```bash
-git clone https://github.com/0x0funky/agent-game-forge.git
+git clone https://github.com/tangdan2204/agent-game-forge.git
 cd agent-game-forge
 npm install
 npm run dev
 ```
 
-This launches:
+启动后默认地址：
 
-- **Daemon** at <http://localhost:7621>
-- **Web UI** at <http://localhost:7620>
+- Daemon：<http://localhost:7621>
+- Web UI：<http://localhost:7620>
 
-Open the web URL. Click the gear icon (top-right) → **Settings**:
+Windows 一键启动（可选）：
 
-1. **Agent CLI** — pick Codex or Claude Code (whichever you installed).
-2. **API keys** (only needed for Claude Code path) — paste your Gemini or OpenAI key. Daemon writes them to `~/.ogf/secrets.json` (mode 600). Env vars (`OPENAI_API_KEY`, `GEMINI_API_KEY`) override the file.
-3. **Image-gen defaults** — choose preferred provider + model.
+```bat
+launch-agf.bat
+```
 
-Close Settings. Open a project folder. Type a prompt like:
+首次使用建议：
 
-> *"Side-scroll platformer about a dog going home, with rooftop and park gate levels."*
-
-Hit send. Watch the agent build it. Press **Play** when it stops.
+1. 打开右上角设置
+2. 选择 Agent CLI（Codex 或 Claude Code）
+3. 配置图像生成提供方与模型（按需填写 API Key）
+4. 打开项目目录并输入需求开始生成
 
 ---
 
-## 🧭 How it works
-
-```
-        ┌──────────────┐    ┌──────────────────────────┐    ┌─────────────┐
-You ─→  │  Web UI      │ ←→ │  Daemon (Node + SQLite)  │ ←→ │  Agent CLI  │
-        │  React canvas│    │  /api/runs, /api/scenes  │    │  (Codex /   │
-        │  Scene editor│    │  /api/gen-image (routed) │    │   Claude    │
-        └──────────────┘    └──────────────┬───────────┘    │   Code)     │
-                                           │                 └─────┬───────┘
-                                           ↓                       │
-                                    ┌──────┴──────┐                │
-                                    │ Gemini /    │ ←──────────────┘
-                                    │ OpenAI API  │   (image gen via
-                                    │ (your key)  │    daemon HTTP)
-                                    └─────────────┘
-```
-
-**1. You talk to the agent in chat.** The web UI streams the conversation; SSE relays every token + tool call.
-
-**2. The agent reads AGF conventions and skills.** Each project is vendored with `.ogf/conventions/` (universal + per-genre rules) and `.agents/skills/` (sprite + map generation procedures). The agent follows the recipes — it doesn't reinvent the pipeline.
-
-**3. For images, the agent calls the daemon's `/api/gen-image`** (via `python .agents/tools/gen-image.py` or direct `curl`). The daemon routes to Gemini or OpenAI using your saved API key. Codex users with the built-in `image_gen` tool can use that instead — both paths produce equivalent PNGs.
-
-**4. The scene editor reads + writes the same JSON files** the agent creates. Drag a platform; the editor commits a JSON patch. Refresh the agent's view; it sees the update.
-
-**5. The runtime is the project itself.** Generated games are pure JS + Canvas — `index.html`, `src/*.js`, `data/*.json`, `assets/`. Push the folder to GitHub Pages. Done.
+## 工作原理
+1. 你在聊天面板输入需求，UI 通过流式方式显示 Agent 输出和工具调用
+2. Daemon 负责调度 Agent CLI、统一 API、写入会话与项目状态
+3. 图像生成请求通过 Daemon 的统一接口转发到对应提供方
+4. 场景编辑器直接读写同一份项目数据文件，修改可立即反映到运行视图
+5. 产物是项目本身（`index.html`、`src/*.js`、`data/*.json`、`assets/*`）
 
 ---
 
-## 📂 Repository layout
-
-```
-open-game-forge/
-├── packages/
-│   └── contracts/      # shared TypeScript types: API, events, SceneModel
-├── apps/
-│   ├── daemon/         # Node.js + Express daemon (port 7621)
-│   │   └── src/
-│   │       ├── server.ts            # HTTP routes
-│   │       ├── codex.ts             # Codex CLI adapter (spawn + stream-json)
-│   │       ├── claude-code.ts       # Claude Code adapter (same pattern)
-│   │       ├── agents.ts            # AgentAdapter dispatcher
-│   │       ├── gen-image.ts         # Gemini + OpenAI router
-│   │       ├── secrets.ts           # ~/.ogf/secrets.json store
-│   │       ├── prefs.ts             # ~/.ogf/preferences.json store
-│   │       ├── web-scene.ts         # JSON level → SceneModel loader
-│   │       ├── scenes.ts            # SceneOp applier (move/scale/add/remove)
-│   │       └── templates/           # vendored skills / conventions / recipes
-│   └── web/            # Vite + React UI (port 7620)
-│       └── src/
-│           ├── App.tsx
-│           ├── components/
-│           │   ├── SceneEditor.tsx  # Canvas-based scene editor
-│           │   ├── SettingsModal.tsx
-│           │   └── PlayPane.tsx
-│           └── lib/api.ts
-└── docs/
-    ├── architecture.md
-    ├── roadmap.md
-    └── genre-support.md
+## 仓库结构
+```text
+agent-game-forge/
+├─ packages/
+│  └─ contracts/                 # 共享 TS 类型定义
+├─ apps/
+│  ├─ daemon/                    # Node + Express 后端守护进程（7621）
+│  │  └─ src/
+│  │     ├─ server.ts
+│  │     ├─ agents.ts
+│  │     ├─ codex.ts
+│  │     ├─ claude-code.ts
+│  │     ├─ gen-image.ts
+│  │     ├─ scenes.ts
+│  │     └─ templates/
+│  └─ web/                       # Vite + React 前端（7620）
+│     └─ src/
+│        ├─ App.tsx
+│        ├─ components/
+│        └─ lib/
+├─ docs/
+├─ launch-agf.bat
+└─ README.md
 ```
 
 ---
 
-## 🛠️ Build from source
-
+## 构建命令
 ```bash
-npm install           # workspace install
-npm run build         # build contracts → daemon → web
-npm run dev           # watch mode for all three (daemon hot-reloads via tsx)
+npm install
+npm run build
+npm run dev
 ```
 
-Useful commands:
+常用子命令：
 
-- `npm -w @ogf/daemon run dev` — daemon only, with `tsx watch`
-- `npm -w @ogf/web run dev` — Vite dev server
-- `npm -w @ogf/contracts run build` — type-check contracts package
+- `npm -w @ogf/daemon run dev`：仅启动 daemon
+- `npm -w @ogf/web run dev`：仅启动前端
+- `npm -w @ogf/contracts run build`：仅构建共享类型包
 
 ---
 
-## 📋 Project status
+## 项目状态
+类型支持（摘要）：
 
-| Genre | Status | Notes |
+| 类型 | 状态 | 说明 |
 |---|---|---|
-| **Side-scroll platformer** | ✅ shipped | Parallax pipeline, hazards, pickups, enemies, multi-level, sprite chroma-key |
-| Top-down RPG | 🟡 partial | Foundation seed + recipes; some recipes still maturing |
-| Tower defense / arena | 🟡 partial | Inherited from earlier branches; needs polish |
-| Roguelike / Metroidvania | 🟡 partial | After launch |
+| 横版平台动作 | 可用 | 当前主打方向 |
+| 俯视角 RPG | 部分可用 | 规则与配方持续完善中 |
+| 塔防 / Arena | 部分可用 | 需要更多模板打磨 |
+| Roguelike / 银河城 | 规划中 | 后续迭代目标 |
 
-**Engine targets**:
+引擎目标：
 
-| Engine | Status | Notes |
+| 引擎 | 状态 | 说明 |
 |---|---|---|
-| **Web** (vanilla JS + Canvas) | ✅ default | Actively developed. Zero framework dependency; push to GitHub Pages and it runs. |
-| **Godot 4** | 🟡 legacy + roadmap | Existing Godot projects still load + edit. First-class re-investment on the post-launch roadmap. |
-| **Unity** | 🚧 planned | Targeted for after Godot first-class lands. |
+| Web（JS + Canvas） | 默认可用 | 当前主路径 |
+| Godot 4 | 规划增强 | 兼容能力持续补齐 |
+| Unity | 规划中 | 后续版本目标 |
 
 ---
 
-## 📚 Documentation
-
-- [`docs/architecture.md`](docs/architecture.md) — design principles, agent-first paradigm
-- [`docs/roadmap.md`](docs/roadmap.md) — phased plan
-- [`docs/genre-support.md`](docs/genre-support.md) — genre matrix
-- Convention files (vendored per-project) — [`apps/daemon/src/templates/conventions/`](apps/daemon/src/templates/conventions)
-- Recipes (vendored per-project) — [`apps/daemon/src/templates/recipes/`](apps/daemon/src/templates/recipes)
+## 文档入口
+- [架构说明](docs/architecture.md)
+- [路线图](docs/roadmap.md)
+- [类型支持矩阵](docs/genre-support.md)
+- [Daemon 模板资源](apps/daemon/src/templates)
 
 ---
 
-## 🤝 Contributing
+## 贡献方式
+欢迎提交 Issue 与 PR。为提升协作效率，建议先在 Issue 中说明目标与范围，再提交实现。
 
-We're pre-launch. The codebase is small enough that PRs are welcome, but please file an issue first to discuss scope. Best ways to help right now:
+优先欢迎：
 
-- **Try it and report bugs** — file an issue with the daemon log (`~/.ogf/claude-code-debug.jsonl` or your shell terminal where `npm run dev` runs)
-- **Build a game** and show us — happy to feature it in the README
-- **Test on macOS / Linux** — primary dev is on Windows; cross-platform issues likely lurk
-
----
-
-## 🔐 Security & data
-
-- **Your code stays on your machine.** AGF is local-first. Daemon binds to `127.0.0.1`; nothing leaves your machine except calls to the AI provider you chose.
-- **API keys** are stored at `~/.ogf/secrets.json` with file mode 600 (owner-only). They never enter git, never appear in AGF's logs.
-- **Conversations** are stored in `~/.ogf/ogf.db` (SQLite). Delete the file to reset.
+- Bug 复现与日志
+- 不同平台（Windows / macOS / Linux）兼容性反馈
+- 真实项目样例与体验反馈
 
 ---
 
-## 📜 License
+## 安全与数据
+- 本地优先：服务默认运行在 `127.0.0.1`
+- 会话与配置默认写入用户目录下的 `.ogf` 数据目录
+- 密钥不进入仓库，不会随源码提交
 
-Licensed under the [Apache License, Version 2.0](LICENSE). You're free to use, modify, fork, and ship — commercial or not. Just keep the copyright + license notice.
+---
+
+## 许可证
+本项目采用 [Apache License 2.0](LICENSE)。
 
 ---
 
-## 🙏 Credits
-
-- Daemon-and-spawn pattern adapted from [`nexu-io/open-design`](https://github.com/nexu-io/open-design)
-- Sprite generation pipeline adapted from [`0x0funky/agent-sprite-forge`](https://github.com/0x0funky/agent-sprite-forge)
-- Built with Codex CLI + Claude Code — yes, this project is largely written by the same agents it drives
-
----
+## 致谢
+- Daemon 与 Agent 编排思路参考：`nexu-io/open-design`
+- 精灵生成管线参考：`0x0funky/agent-sprite-forge`
 
 <p align="center">
-  Made for indie game devs who like to ship.<br/>
-  <a href="https://github.com/0x0funky/agent-game-forge/issues">Report a bug</a> ·
-  <a href="https://github.com/0x0funky/agent-game-forge/discussions">Discussions</a>
+  如果你在使用 AGF 过程中遇到问题，欢迎提 Issue。<br/>
+  <a href="https://github.com/tangdan2204/agent-game-forge/issues">问题反馈</a> ·
+  <a href="https://github.com/tangdan2204/agent-game-forge/discussions">社区讨论</a>
 </p>
