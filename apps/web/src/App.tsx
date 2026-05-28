@@ -947,7 +947,15 @@ export function App() {
     setTurns((prev) => {
       if (prev.length === 0) return prev;
       const next = [...prev];
-      const last = { ...next[next.length - 1], status, endedAt: Date.now(), error };
+      const prevLast = next[next.length - 1];
+      const last = {
+        ...prevLast,
+        status,
+        endedAt: Date.now(),
+        // Preserve existing error text when end-event arrives without
+        // an explicit message. Previously `end` cleared error details.
+        error: error ?? prevLast.error,
+      };
       next[next.length - 1] = last;
       return next;
     });

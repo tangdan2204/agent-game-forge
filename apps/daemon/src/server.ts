@@ -1413,6 +1413,42 @@ export function createServer() {
 
     const agentEvents: AgentEvent[] = [];
     let agentTextBuffer = '';
+    let sawProcessError = false;
+    let stdoutTail = '';
+    let stderrTail = '';
+    const pushTail = (cur: string, chunk: string, max = 8192): string => {
+      const next = cur + chunk;
+      return next.length > max ? next.slice(next.length - max) : next;
+    };
+    const summarizeLine = (line: string): string =>
+      line.length > 320 ? line.slice(0, 320) + '…' : line;
+    const extractFailureDetail = (stderrRaw: string, stdoutRaw: string): string | null => {
+      const stderrLines = stderrRaw
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const stdoutLines = stdoutRaw
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const isNoisy = (s: string) =>
+        /^warning:\s+`--full-auto` is deprecated/i.test(s);
+      const isStrongSignal = (s: string) =>
+        /(error|failed|invalid|unknown|not found|exception|cannot|denied)/i.test(s);
+
+      const strong =
+        stderrLines.find(isStrongSignal) ??
+        stdoutLines.find(isStrongSignal);
+      if (strong) return summarizeLine(strong);
+
+      const nonNoisy =
+        stderrLines.find((s) => !isNoisy(s)) ??
+        stdoutLines.find((s) => !isNoisy(s));
+      if (nonNoisy) return summarizeLine(nonNoisy);
+
+      const fallback = stderrLines[0] ?? stdoutLines[0];
+      return fallback ? summarizeLine(fallback) : null;
+    };
 
     const parser = adapter.makeParser({
       // Heartbeat: every line read from the agent's stdout resets this
@@ -1443,19 +1479,37 @@ export function createServer() {
     });
 
     child.stdout?.on('data', (chunk: Buffer) => {
-      runs.emit(run, 'stdout', { chunk: chunk.toString('utf8') });
+      const text = chunk.toString('utf8');
+      stdoutTail = pushTail(stdoutTail, text);
+      runs.emit(run, 'stdout', { chunk: text });
       parser.feed(chunk);
     });
     child.stderr?.on('data', (chunk: Buffer) => {
-      runs.emit(run, 'stderr', { chunk: chunk.toString('utf8') });
+      const text = chunk.toString('utf8');
+      stderrTail = pushTail(stderrTail, text);
+      runs.emit(run, 'stderr', { chunk: text });
     });
     child.on('error', (err) => {
+      sawProcessError = true;
       runs.emit(run, 'error', { message: err.message });
     });
     child.on('close', (code, signal) => {
       parser.flush();
       imageWatcher.stop();
       const status = code === 0 ? 'succeeded' : 'failed';
+      if (status === 'failed' && !sawProcessError && run.killReason !== 'stalled') {
+        const base =
+          code !== null
+            ? `Agent process exited with code ${code}`
+            : 'Agent process exited unexpectedly';
+        const detail = extractFailureDetail(stderrTail, stdoutTail);
+        runs.emit(run, 'error', {
+          message: detail ? `${base}: ${detail}` : base,
+          code,
+          signal,
+          reason: 'process_exit',
+        });
+      }
 
       // Persist agent message (text + raw events) so refresh restores it.
       if (agentTextBuffer.trim() || agentEvents.length > 0) {
