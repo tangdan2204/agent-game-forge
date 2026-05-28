@@ -4620,6 +4620,136 @@ input, textarea, select { font: inherit; color: inherit; background: none; borde
   word-break: break-word;
 }
 
+/* =============== OPERATION LOGS =============== */
+.ops-log-fab {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 60;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-1);
+  color: var(--ink-0);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+.ops-log-fab:hover {
+  background: var(--bg-2);
+  border-color: var(--accent-line);
+}
+
+.ops-log-panel {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 58px;
+  z-index: 59;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--bg-1);
+  box-shadow: var(--shadow-pop);
+  display: grid;
+  grid-template-rows: auto minmax(220px, 46vh);
+  overflow: hidden;
+}
+.ops-log-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.ops-log-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-1);
+}
+.ops-log-title strong {
+  font-size: 13px;
+  color: var(--ink-0);
+}
+.ops-log-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 6px;
+}
+.ops-log-list {
+  overflow: auto;
+  padding: 8px;
+  user-select: text;
+}
+.ops-log-empty {
+  color: var(--ink-3);
+  font-size: 12px;
+  padding: 12px;
+}
+.ops-log-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-0);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.ops-log-item.is-error {
+  border-color: color-mix(in oklch, var(--red) 55%, var(--line));
+}
+.ops-log-item-head {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.ops-log-ts {
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+}
+.ops-log-channel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ops-log-message {
+  font-size: 12px;
+  color: var(--ink-0);
+  line-height: 1.4;
+  word-break: break-word;
+}
+.ops-log-copy {
+  border: 1px solid var(--line);
+  background: var(--bg-1);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--ink-1);
+}
+.ops-log-copy:hover {
+  background: var(--bg-2);
+  border-color: var(--line-strong);
+}
+.ops-log-detail {
+  margin: 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* =============== ASSET-CENTRIC SIDEBAR =============== */
 
 /* View toggle — segmented control: Grouped | Files */

@@ -39,6 +39,7 @@ import {
   subscribeRun,
   writeFileContent,
 } from './lib/api.js';
+import type { StreamEvent } from './lib/api.js';
 import { Turn, type TurnStatus } from './components/Turn.js';
 import { SpecProgressCard } from './components/SpecProgressCard.js';
 import { FileTree } from './components/FileTree.js';
@@ -68,6 +69,16 @@ interface UiTurn {
   endedAt?: number;
   error?: string;
 }
+
+type OperationLogChannel = 'ui' | 'run' | 'agent' | 'stdout' | 'stderr' | 'error';
+interface OperationLogEntry {
+  id: string;
+  ts: number;
+  channel: OperationLogChannel;
+  message: string;
+  detail?: string;
+}
+const MAX_OPERATION_LOGS = 2000;
 
 const LS_PROJECT = 'ogf:lastProject';
 const LS_CONVERSATION = 'ogf:lastConversation';
@@ -176,6 +187,58 @@ export function App() {
 
   // Chat
   const [turns, setTurns] = useState<UiTurn[]>([]);
+  const [showOperationLogs, setShowOperationLogs] = useState(false);
+  const [operationLogs, setOperationLogs] = useState<OperationLogEntry[]>([]);
+  const operationLogListRef = useRef<HTMLDivElement | null>(null);
+
+  const appendOperationLog = useCallback((entry: Omit<OperationLogEntry, 'id' | 'ts'>) => {
+    setOperationLogs((prev) => {
+      const next = [
+        ...prev,
+        {
+          id: cryptoRandomId(),
+          ts: Date.now(),
+          ...entry,
+        },
+      ];
+      if (next.length <= MAX_OPERATION_LOGS) return next;
+      return next.slice(next.length - MAX_OPERATION_LOGS);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!showOperationLogs) return;
+    const el = operationLogListRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [showOperationLogs, operationLogs.length]);
+
+  const copyOperationLogText = useCallback(
+    async (text: string, successTitle: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        notify({ kind: 'success', title: successTitle, body: '已复制到剪贴板。' });
+      } catch {
+        // Fallback for environments where navigator.clipboard is unavailable.
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand('copy');
+          notify({ kind: 'success', title: successTitle, body: '已复制到剪贴板。' });
+        } catch {
+          notify({ kind: 'error', title: '复制失败', body: '当前环境不支持剪贴板写入。' });
+        } finally {
+          document.body.removeChild(ta);
+        }
+      }
+    },
+    [notify],
+  );
   // Defaults chosen for OGF use case: gpt-5.5 + xhigh reasoning under Codex.
   // Real values are loaded per-agent from localStorage in an effect below —
   // these are just the bootstrap values until the agent detection completes.
@@ -751,6 +814,7 @@ export function App() {
     closeRunSub();
     setConversationId(id);
     localStorage.setItem(LS_CONVERSATION, id);
+    appendOperationLog({ channel: 'ui', message: `切换会话: ${id}` });
     // Snap the active CLI to whichever one owns this conversation. The
     // conversation's agent_id is locked at create time; switching CLIs
     // mid-thread would break resume (codex thread id ≠ claude session id).
@@ -771,6 +835,11 @@ export function App() {
       // The user's last message has no agent reply yet because the
       // codex hasn't closed; we already marked that turn as 'streaming'
       // via messagesToTurns(active=true) above.
+      appendOperationLog({
+        channel: 'run',
+        message: `检测到活动 run，恢复订阅: ${active.runId}`,
+        detail: `conversation=${id}`,
+      });
       setRunId(active.runId);
       setRunning(true);
       subscribeToRun(active.runId);
@@ -789,6 +858,7 @@ export function App() {
   function subscribeToRun(runId: string) {
     closeRunSub();
     runUnsubRef.current = subscribeRun(runId, (e) => {
+      logStreamEvent(runId, e, 'resume');
       if (e.type === 'agent') {
         appendEventToLastTurn(e.data);
         // Schedule a debounced tree refresh on Edit / image_gen events
@@ -849,11 +919,16 @@ export function App() {
       project.path,
       (agent?.id as 'codex' | 'claude-code' | undefined) ?? 'codex',
     );
+    appendOperationLog({
+      channel: 'ui',
+      message: `新建会话: ${conversation.id}`,
+      detail: `agent=${conversation.agentId}`,
+    });
     setConversations((prev) => [conversation, ...prev]);
     setConversationId(conversation.id);
     localStorage.setItem(LS_CONVERSATION, conversation.id);
     setTurns([]);
-  }, [project, agent?.id]);
+  }, [project, agent?.id, appendOperationLog]);
 
   const deleteConversationAt = useCallback(
     async (id: string) => {
@@ -961,6 +1036,86 @@ export function App() {
     });
   }
 
+  function clipLogText(text: string, max = 2000): string {
+    if (text.length <= max) return text;
+    return `${text.slice(0, max)}\n…(truncated ${text.length - max} chars)`;
+  }
+
+  function summarizeAgentLog(ev: AgentEvent): { message: string; detail?: string } {
+    if (ev.type === 'status') return { message: `status: ${ev.label}` };
+    if (ev.type === 'text_delta') {
+      return { message: `text_delta (${ev.delta.length} chars)`, detail: clipLogText(ev.delta, 400) };
+    }
+    if (ev.type === 'tool_use') {
+      return {
+        message: `tool_use: ${ev.name}`,
+        detail: clipLogText(JSON.stringify(ev.input ?? {}, null, 2)),
+      };
+    }
+    if (ev.type === 'tool_result') {
+      return {
+        message: `tool_result${ev.isError ? ' (error)' : ''}: ${ev.toolUseId}`,
+        detail: clipLogText(ev.content ?? ''),
+      };
+    }
+    if (ev.type === 'usage') {
+      return { message: `usage in=${ev.usage.input ?? 0} out=${ev.usage.output ?? 0} cache=${ev.usage.cachedRead ?? 0}` };
+    }
+    if (ev.type === 'raw') {
+      return {
+        message: 'raw event',
+        detail:
+          typeof ev.raw === 'string'
+            ? clipLogText(ev.raw)
+            : clipLogText(JSON.stringify(ev.raw, null, 2)),
+      };
+    }
+    return { message: ev.type };
+  }
+
+  function logStreamEvent(runId: string, e: StreamEvent, source: 'live' | 'resume') {
+    if (e.type === 'agent') {
+      const info = summarizeAgentLog(e.data);
+      appendOperationLog({
+        channel: 'agent',
+        message: `[${source}] run=${runId} ${info.message}`,
+        detail: info.detail,
+      });
+      return;
+    }
+    if (e.type === 'stdout' || e.type === 'stderr') {
+      appendOperationLog({
+        channel: e.type,
+        message: `[${source}] run=${runId} ${e.type} chunk (${e.data.chunk.length} chars)`,
+        detail: clipLogText(e.data.chunk),
+      });
+      return;
+    }
+    if (e.type === 'start') {
+      appendOperationLog({
+        channel: 'run',
+        message: `[${source}] run started: ${runId}`,
+        detail: clipLogText(JSON.stringify(e.data, null, 2)),
+      });
+      return;
+    }
+    if (e.type === 'error') {
+      appendOperationLog({
+        channel: 'error',
+        message: `[${source}] run error: ${runId}`,
+        detail: e.data.message,
+      });
+      return;
+    }
+    if (e.type === 'end') {
+      appendOperationLog({
+        channel: 'run',
+        message: `[${source}] run ended: ${runId} (${e.data.status})`,
+        detail: clipLogText(JSON.stringify(e.data, null, 2)),
+      });
+    }
+  }
+
   // Question-form submit: format answers as a prose block, lock the form,
   // and immediately send as the next turn. The form's Submit IS the user's
   // confirmation — making them click 'Send' next would be redundant.
@@ -988,6 +1143,11 @@ export function App() {
     const text = overridePrompt ?? prompt;
     if (!text.trim() || running || !project) return;
     if (!agent?.available) {
+      appendOperationLog({
+        channel: 'error',
+        message: '发送被拒绝：CLI 不可用',
+        detail: `agent=${agent?.id ?? 'unknown'}`,
+      });
       notify({
         kind: 'error',
         title: 'CLI 不可用',
@@ -999,6 +1159,11 @@ export function App() {
       ? conversations.find((c) => c.id === conversationId)
       : null;
     if (activeConv && activeConv.agentId !== agent.id) {
+      appendOperationLog({
+        channel: 'error',
+        message: '发送被拒绝：会话 CLI 不匹配',
+        detail: `conversationAgent=${activeConv.agentId}, selectedAgent=${agent.id}`,
+      });
       notify({
         kind: 'error',
         title: '会话 CLI 不匹配',
@@ -1011,6 +1176,11 @@ export function App() {
 
     const userText = text.trim();
     setPrompt('');
+    appendOperationLog({
+      channel: 'ui',
+      message: `发送消息 (${userText.length} chars)`,
+      detail: clipLogText(userText, 800),
+    });
 
     const newTurn: UiTurn = {
       id: cryptoRandomId(),
@@ -1033,6 +1203,11 @@ export function App() {
         reasoning,
         refImagePaths: refs.length > 0 ? refs.map((x) => x.relPath) : undefined,
       });
+      appendOperationLog({
+        channel: 'run',
+        message: 'createRun 请求成功',
+        detail: clipLogText(JSON.stringify(r, null, 2)),
+      });
 
       // Daemon detected a duplicate — same conversation already has an
       // active run. Reuse it instead of creating a fork. This shouldn't
@@ -1043,10 +1218,20 @@ export function App() {
         if (!r.existingRunId) {
           throw new Error('duplicate run response missing existingRunId');
         }
+        appendOperationLog({
+          channel: 'run',
+          message: `复用运行中的 run: ${r.existingRunId}`,
+          detail: `startedAt=${r.startedAt}`,
+        });
         setRunId(r.existingRunId);
         subscribeToRun(r.existingRunId);
         return;
       }
+      appendOperationLog({
+        channel: 'run',
+        message: `新 run 已创建: ${r.runId}`,
+        detail: `conversation=${r.conversationId}`,
+      });
       setRunId(r.runId);
 
       if (!conversationId || conversationId !== r.conversationId) {
@@ -1075,6 +1260,7 @@ export function App() {
 
       closeRunSub();
       runUnsubRef.current = subscribeRun(r.runId, (e) => {
+        logStreamEvent(r.runId, e, 'live');
         if (e.type === 'agent') {
           if (e.data.type === 'tool_use' && e.data.name === 'Edit') {
             const changes = (e.data.input as { changes?: { path?: string }[] })?.changes ?? [];
@@ -1143,6 +1329,11 @@ export function App() {
         }
       });
     } catch (err) {
+      appendOperationLog({
+        channel: 'error',
+        message: '发送失败',
+        detail: err instanceof Error ? err.message : String(err),
+      });
       finalizeLastTurn('failed', err instanceof Error ? err.message : String(err));
       setRunning(false);
       setRunId(null);
@@ -1156,6 +1347,11 @@ export function App() {
     // forever — we still optimistically reset UI state so the button is
     // never stuck.
     const id = runId;
+    appendOperationLog({
+      channel: 'ui',
+      message: '手动停止运行',
+      detail: id ? `run=${id}` : 'runId unavailable (possibly still creating)',
+    });
     if (id) {
       try {
         await cancelRun(id);
@@ -1203,6 +1399,10 @@ export function App() {
     : running
     ? '进行中'
     : timeAgo(lastRunAt);
+  const operationLogExport = useMemo(
+    () => operationLogs.map(formatOperationLogLine).join('\n\n'),
+    [operationLogs],
+  );
 
   return (
     <div
@@ -1401,6 +1601,66 @@ export function App() {
 
       {/* v2: status bar removed (no chrome at the bottom of the app — agent
        *  state lives in the sidebar foot, save state shows on save badges). */}
+
+      <button
+        type="button"
+        className="ops-log-fab"
+        onClick={() => setShowOperationLogs((v) => !v)}
+        title={showOperationLogs ? '关闭日志面板' : '查看实时操作日志'}
+      >
+        {showOperationLogs ? '📕 关闭日志' : '🧾 日志'}
+      </button>
+
+      {showOperationLogs && (
+        <section className="ops-log-panel" aria-label="实时操作日志">
+          <div className="ops-log-head">
+            <div className="ops-log-title">
+              <strong>实时操作日志</strong>
+              <span>{operationLogs.length} 条</span>
+            </div>
+            <div className="ops-log-actions">
+              <button
+                className="btn btn-sm"
+                onClick={() => void copyOperationLogText(operationLogExport || '(empty)', '已复制全部日志')}
+              >
+                复制全部
+              </button>
+              <button
+                className="btn btn-sm btn-ghost"
+                onClick={() => setOperationLogs([])}
+                disabled={operationLogs.length === 0}
+              >
+                清空
+              </button>
+              <button className="btn btn-sm btn-ghost" onClick={() => setShowOperationLogs(false)}>
+                关闭
+              </button>
+            </div>
+          </div>
+          <div className="ops-log-list" ref={operationLogListRef}>
+            {operationLogs.length === 0 ? (
+              <div className="ops-log-empty">暂无日志。执行一次对话后这里会实时显示所有操作。</div>
+            ) : (
+              operationLogs.map((log) => (
+                <article key={log.id} className={`ops-log-item is-${log.channel}`}>
+                  <header className="ops-log-item-head">
+                    <span className="ops-log-ts">{formatLogTimestamp(log.ts)}</span>
+                    <span className="ops-log-channel">{log.channel}</span>
+                    <span className="ops-log-message">{log.message}</span>
+                    <button
+                      className="ops-log-copy"
+                      onClick={() => void copyOperationLogText(formatOperationLogLine(log), '已复制日志')}
+                    >
+                      复制
+                    </button>
+                  </header>
+                  {log.detail && <pre className="ops-log-detail">{log.detail}</pre>}
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      )}
 
       {showOpenModal && (
         <FolderPickerModal
@@ -2699,6 +2959,18 @@ function timeAgo(ts: number): string {
   if (h < 24) return `${h} 小时前`;
   const d = Math.floor(h / 24);
   return `${d} 天前`;
+}
+
+function formatLogTimestamp(ts: number): string {
+  const d = new Date(ts);
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)}`;
+}
+
+function formatOperationLogLine(log: OperationLogEntry): string {
+  const head = `[${formatLogTimestamp(log.ts)}] [${log.channel}] ${log.message}`;
+  if (!log.detail) return head;
+  return `${head}\n${log.detail}`;
 }
 
 /** Pull the descriptive tail off labels like 'gpt-5.5 · frontier coding'.
