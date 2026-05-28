@@ -505,8 +505,28 @@ export async function createRun(
     body: JSON.stringify(req),
   });
   if (r.status === 409) {
-    const data = (await r.json()) as { existingRunId: string; startedAt: number };
-    return { duplicate: true, existingRunId: data.existingRunId, startedAt: data.startedAt };
+    // 409 has two meanings:
+    // 1) duplicate active run (has existingRunId) -> caller should re-subscribe.
+    // 2) other conflicts (e.g. conversation bound to another CLI) -> throw.
+    const raw = await r.text();
+    let data: { existingRunId?: unknown; startedAt?: unknown; error?: unknown } | null = null;
+    try {
+      data = JSON.parse(raw) as { existingRunId?: unknown; startedAt?: unknown; error?: unknown };
+    } catch {
+      data = null;
+    }
+    if (typeof data?.existingRunId === 'string' && data.existingRunId.length > 0) {
+      return {
+        duplicate: true,
+        existingRunId: data.existingRunId,
+        startedAt: typeof data.startedAt === 'number' ? data.startedAt : Date.now(),
+      };
+    }
+    const msg =
+      (typeof data?.error === 'string' && data.error) ||
+      raw ||
+      'conflict';
+    throw new Error(`/api/runs: 409 ${msg}`);
   }
   if (!r.ok) {
     const t = await r.text();

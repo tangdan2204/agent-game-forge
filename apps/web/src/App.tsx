@@ -1032,6 +1032,9 @@ export function App() {
       // if a refresh / reconnect race leaves the frontend without runId,
       // the daemon catches it and we recover.
       if ('duplicate' in r) {
+        if (!r.existingRunId) {
+          throw new Error('duplicate run response missing existingRunId');
+        }
         setRunId(r.existingRunId);
         subscribeToRun(r.existingRunId);
         return;
