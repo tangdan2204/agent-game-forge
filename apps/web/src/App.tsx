@@ -90,11 +90,15 @@ const LS_AGENT_COLLAPSED = 'ogf:agentCollapsed';
 const LS_TREE_COLLAPSED = 'ogf:treeCollapsed';
 const LS_SIDEBAR_W = 'ogf:sidebarWidth';
 const LS_LAST_FILE_PREFIX = 'ogf:lastFile:'; // per-project: { tab, relPath }
+const LS_OPS_LOG_FAB_POS = 'ogf:opsLogFabPos';
 // Per-agent UI state. Switching CLIs in Settings auto-loads the values the
 // user last picked for that CLI — avoids 'model gpt-5.5 not found' errors
 // when switching to Claude Code while the dropdown still points at a Codex id.
 const LS_MODEL_BY_AGENT = 'ogf:modelByAgent'; // { codex: 'gpt-5.5', 'claude-code': 'default' }
 const LS_REASONING_BY_AGENT = 'ogf:reasoningByAgent'; // { codex: 'xhigh', ... }
+const OPS_LOG_FAB_W = 140;
+const OPS_LOG_FAB_H = 34;
+const OPS_LOG_FAB_MARGIN = 10;
 
 function readJsonMap(key: string): Record<string, string> {
   try {
@@ -111,6 +115,44 @@ function writeJsonMap(key: string, map: Record<string, string>): void {
     localStorage.setItem(key, JSON.stringify(map));
   } catch {
     /* quota / disabled storage — silently no-op */
+  }
+}
+
+function clampOpsLogFabPos(pos: { x: number; y: number }): { x: number; y: number } {
+  if (typeof window === 'undefined') return pos;
+  const maxX = Math.max(
+    OPS_LOG_FAB_MARGIN,
+    window.innerWidth - OPS_LOG_FAB_W - OPS_LOG_FAB_MARGIN,
+  );
+  const maxY = Math.max(
+    OPS_LOG_FAB_MARGIN,
+    window.innerHeight - OPS_LOG_FAB_H - OPS_LOG_FAB_MARGIN,
+  );
+  return {
+    x: Math.min(maxX, Math.max(OPS_LOG_FAB_MARGIN, Math.round(pos.x))),
+    y: Math.min(maxY, Math.max(OPS_LOG_FAB_MARGIN, Math.round(pos.y))),
+  };
+}
+
+function defaultOpsLogFabPos(): { x: number; y: number } {
+  if (typeof window === 'undefined') return { x: OPS_LOG_FAB_MARGIN, y: OPS_LOG_FAB_MARGIN };
+  return clampOpsLogFabPos({
+    x: (window.innerWidth - OPS_LOG_FAB_W) / 2,
+    y: window.innerHeight - OPS_LOG_FAB_H - 14,
+  });
+}
+
+function readOpsLogFabPos(): { x: number; y: number } {
+  try {
+    const raw = localStorage.getItem(LS_OPS_LOG_FAB_POS);
+    if (!raw) return defaultOpsLogFabPos();
+    const parsed = JSON.parse(raw) as { x?: unknown; y?: unknown };
+    if (typeof parsed?.x !== 'number' || typeof parsed?.y !== 'number') {
+      return defaultOpsLogFabPos();
+    }
+    return clampOpsLogFabPos({ x: parsed.x, y: parsed.y });
+  } catch {
+    return defaultOpsLogFabPos();
   }
 }
 
@@ -203,6 +245,17 @@ export function App() {
   const [showOperationLogs, setShowOperationLogs] = useState(false);
   const [operationLogs, setOperationLogs] = useState<OperationLogEntry[]>([]);
   const operationLogListRef = useRef<HTMLDivElement | null>(null);
+  const [opsLogFabPos, setOpsLogFabPos] = useState(() => readOpsLogFabPos());
+  const [opsLogFabDragging, setOpsLogFabDragging] = useState(false);
+  const opsLogFabDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    moved: boolean;
+  } | null>(null);
+  const opsLogFabSuppressClickRef = useRef(false);
 
   const appendOperationLog = useCallback((entry: Omit<OperationLogEntry, 'id' | 'ts'>) => {
     setOperationLogs((prev) => {
@@ -225,6 +278,21 @@ export function App() {
     if (!el) return;
     el.scrollTop = el.scrollHeight;
   }, [showOperationLogs, operationLogs.length]);
+
+  useEffect(() => {
+    setOpsLogFabPos((prev) => clampOpsLogFabPos(prev));
+    const onResize = () => setOpsLogFabPos((prev) => clampOpsLogFabPos(prev));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_OPS_LOG_FAB_POS, JSON.stringify(opsLogFabPos));
+    } catch {
+      // ignore storage failures
+    }
+  }, [opsLogFabPos]);
 
   const copyOperationLogText = useCallback(
     async (text: string, successTitle: string) => {
@@ -1413,6 +1481,65 @@ export function App() {
     }
   }
 
+  function onOpsLogFabPointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    if (e.button !== 0) return;
+    opsLogFabDragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      originX: opsLogFabPos.x,
+      originY: opsLogFabPos.y,
+      moved: false,
+    };
+    setOpsLogFabDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function onOpsLogFabPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const drag = opsLogFabDragRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) >= 4) {
+      drag.moved = true;
+    }
+    setOpsLogFabPos(
+      clampOpsLogFabPos({
+        x: drag.originX + dx,
+        y: drag.originY + dy,
+      }),
+    );
+  }
+
+  function onOpsLogFabPointerUp(e: React.PointerEvent<HTMLButtonElement>) {
+    const drag = opsLogFabDragRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    if (drag.moved) opsLogFabSuppressClickRef.current = true;
+    opsLogFabDragRef.current = null;
+    setOpsLogFabDragging(false);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  function onOpsLogFabPointerCancel(e: React.PointerEvent<HTMLButtonElement>) {
+    const drag = opsLogFabDragRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    opsLogFabDragRef.current = null;
+    setOpsLogFabDragging(false);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  function onOpsLogFabClick() {
+    if (opsLogFabSuppressClickRef.current) {
+      opsLogFabSuppressClickRef.current = false;
+      return;
+    }
+    setShowOperationLogs((v) => !v);
+  }
+
   // Split drag
   function onSplitDragStart(e: React.MouseEvent) {
     e.preventDefault();
@@ -1643,9 +1770,14 @@ export function App() {
 
       <button
         type="button"
-        className="ops-log-fab"
-        onClick={() => setShowOperationLogs((v) => !v)}
-        title={showOperationLogs ? '关闭日志面板' : '查看实时操作日志'}
+        className={`ops-log-fab${opsLogFabDragging ? ' is-dragging' : ''}`}
+        style={{ left: opsLogFabPos.x, top: opsLogFabPos.y }}
+        onPointerDown={onOpsLogFabPointerDown}
+        onPointerMove={onOpsLogFabPointerMove}
+        onPointerUp={onOpsLogFabPointerUp}
+        onPointerCancel={onOpsLogFabPointerCancel}
+        onClick={onOpsLogFabClick}
+        title={showOperationLogs ? '关闭日志面板（可拖动）' : '查看实时操作日志（可拖动）'}
       >
         {showOperationLogs ? '📕 关闭日志' : '🧾 日志'}
       </button>

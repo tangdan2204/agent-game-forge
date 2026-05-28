@@ -4623,8 +4623,6 @@ input, textarea, select { font: inherit; color: inherit; background: none; borde
 /* =============== OPERATION LOGS =============== */
 .ops-log-fab {
   position: fixed;
-  left: 18px;
-  bottom: 18px;
   z-index: 60;
   height: 34px;
   padding: 0 12px;
@@ -4635,11 +4633,17 @@ input, textarea, select { font: inherit; color: inherit; background: none; borde
   font-size: 12px;
   font-weight: 600;
   box-shadow: var(--shadow-md);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .ops-log-fab:hover {
   background: var(--bg-2);
   border-color: var(--accent-line);
+}
+.ops-log-fab.is-dragging {
+  cursor: grabbing;
 }
 
 .ops-log-panel {
