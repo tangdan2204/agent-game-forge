@@ -184,6 +184,19 @@ export function App() {
     return () =>
       window.removeEventListener('ogf:preferred-agent-changed', onSwitch as EventListener);
   }, [conversationId, conversations, notify]);
+  // Safety-net: keep selected CLI in sync with the active conversation's
+  // locked agentId, even if conversation/project state arrives in multiple
+  // async steps.
+  useEffect(() => {
+    if (!conversationId) return;
+    const activeConv = conversations.find((c) => c.id === conversationId);
+    if (!activeConv?.agentId) return;
+    if (agent?.id === activeConv.agentId) return;
+    void fetchAgents().then((r) => {
+      const next = r.agents.find((a) => a.id === activeConv.agentId) ?? null;
+      if (next) setAgent(next);
+    });
+  }, [conversationId, conversations, agent?.id]);
 
   // Chat
   const [turns, setTurns] = useState<UiTurn[]>([]);
@@ -1142,37 +1155,63 @@ export function App() {
   async function send(overridePrompt?: string) {
     const text = overridePrompt ?? prompt;
     if (!text.trim() || running || !project) return;
-    if (!agent?.available) {
+    const activeConv = conversationId
+      ? conversations.find((c) => c.id === conversationId)
+      : null;
+    const runAgentId = (activeConv?.agentId ?? agent?.id ?? 'codex') as
+      | 'codex'
+      | 'claude-code';
+    let runAgent = agent;
+    if (!runAgent || runAgent.id !== runAgentId) {
+      const fetched = await fetchAgents()
+        .then((r) => r.agents.find((a) => a.id === runAgentId) ?? null)
+        .catch(() => null);
+      if (fetched) {
+        runAgent = fetched;
+        setAgent(fetched);
+      }
+    }
+    if (!runAgent || runAgent.id !== runAgentId) {
+      appendOperationLog({
+        channel: 'error',
+        message: '发送被拒绝：会话 CLI 同步失败',
+        detail: `conversationAgent=${activeConv?.agentId ?? 'none'}, selectedAgent=${agent?.id ?? 'none'}`,
+      });
+      notify({
+        kind: 'error',
+        title: '会话 CLI 同步失败',
+        body: '当前会话的 CLI 状态还未同步完成，请稍后重试。',
+      });
+      return;
+    }
+    if (!runAgent.available) {
       appendOperationLog({
         channel: 'error',
         message: '发送被拒绝：CLI 不可用',
-        detail: `agent=${agent?.id ?? 'unknown'}`,
+        detail: `agent=${runAgentId}`,
       });
       notify({
         kind: 'error',
         title: 'CLI 不可用',
-        body: '当前选中的 CLI 未就绪，请在设置中确认安装状态后重试。',
+        body: '当前会话绑定的 CLI 未就绪，请在设置里确认后重试。',
       });
       return;
     }
-    const activeConv = conversationId
-      ? conversations.find((c) => c.id === conversationId)
-      : null;
-    if (activeConv && activeConv.agentId !== agent.id) {
+    if (activeConv && activeConv.agentId !== agent?.id) {
       appendOperationLog({
-        channel: 'error',
-        message: '发送被拒绝：会话 CLI 不匹配',
-        detail: `conversationAgent=${activeConv.agentId}, selectedAgent=${agent.id}`,
+        channel: 'ui',
+        message: '已自动对齐会话 CLI',
+        detail: `conversationAgent=${activeConv.agentId}, selectedAgent=${agent?.id ?? 'none'}`,
       });
-      notify({
-        kind: 'error',
-        title: '会话 CLI 不匹配',
-        body: `当前会话属于 ${activeConv.agentId === 'claude-code' ? 'Claude Code' : 'Codex CLI'}，请先新建会话，再用 ${
-          agent.id === 'claude-code' ? 'Claude Code' : 'Codex CLI'
-        } 对话。`,
-      });
-      return;
     }
+    const runModelIds = (runAgent.models ?? []).map((m) => m.id);
+    const runModel =
+      model === 'default'
+        ? 'default'
+        : runModelIds.includes(model)
+          ? model
+          : runModelIds[0] ?? 'default';
+    if (runModel !== model) setModel(runModel);
 
     const userText = text.trim();
     setPrompt('');
@@ -1195,12 +1234,12 @@ export function App() {
 
     try {
       const r = await createRun({
-        agentId: agent?.id ?? 'codex',
+        agentId: runAgentId,
         prompt: userText,
         projectPath: project.path,
         conversationId: conversationId ?? undefined,
-        model: model === 'default' ? undefined : model,
-        reasoning,
+        model: runModel === 'default' ? undefined : runModel,
+        reasoning: runAgentId === 'codex' ? reasoning : undefined,
         refImagePaths: refs.length > 0 ? refs.map((x) => x.relPath) : undefined,
       });
       appendOperationLog({
