@@ -86,7 +86,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
     } catch (err) {
       notify({
         kind: 'error',
-        title: 'Upload failed',
+        title: '上传失败',
         body: err instanceof Error ? err.message : String(err),
       });
     } finally {
@@ -107,7 +107,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
     } catch (err) {
       notify({
         kind: 'error',
-        title: 'Could not remove',
+        title: '移除失败',
         body: err instanceof Error ? err.message : String(err),
       });
     }
@@ -137,7 +137,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
         <>
           <span className="lbl">
             {I.image}
-            <span style={{ color: 'var(--ink-1)', fontWeight: 500 }}>Attached</span>
+            <span style={{ color: 'var(--ink-1)', fontWeight: 500 }}>已附加</span>
             <span className="mono" style={{ color: 'var(--ink-3)', fontSize: 10.5 }}>
               {props.refs.length}/{MAX_REFS}
             </span>
@@ -155,7 +155,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
                       e.stopPropagation();
                       void removeRef(r.relPath);
                     }}
-                    title="Remove"
+                    title="移除"
                   >
                     ×
                   </button>
@@ -173,7 +173,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
                       e.stopPropagation();
                       void removeRef(r.relPath);
                     }}
-                    title="Remove"
+                    title="移除"
                   >
                     ×
                   </button>
@@ -183,7 +183,7 @@ export const Dropzone = forwardRef<DropzoneHandle, Props>(function Dropzone(
             {canAdd && (
               <button
                 className="add-btn"
-                title={busy ? 'Uploading…' : 'Add attachment'}
+                title={busy ? '上传中…' : '添加附件'}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={busy}
               >

@@ -69,8 +69,8 @@ export function FolderPickerModal(props: Props) {
       >
         <div className="modal-head">
           <span style={{ color: 'var(--accent)' }}>{I.folder}</span>
-          <span className="title">Open project folder</span>
-          <span className="sub">click to navigate · projects highlighted</span>
+          <span className="title">打开项目文件夹</span>
+          <span className="sub">点击进入目录 · 项目目录会高亮显示</span>
           <button className="close" onClick={props.onCancel}>{I.close}</button>
         </div>
 
@@ -78,7 +78,7 @@ export function FolderPickerModal(props: Props) {
           <button
             className="btn btn-sm btn-ghost"
             onClick={() => navigate('')}
-            title="Drive list / home"
+            title="磁盘列表 / 主目录"
           >
             {navigator.platform.toLowerCase().includes('win') ? '🖥' : '🏠'}
           </button>
@@ -86,13 +86,13 @@ export function FolderPickerModal(props: Props) {
             <button
               className="btn btn-sm btn-ghost"
               onClick={() => navigate(data.parent ?? '')}
-              title="Up one level"
+              title="返回上一级"
             >
               ↑
             </button>
           )}
           <div className="picker-crumbs">
-            {data?.parts.length === 0 && <span className="muted mono" style={{ fontSize: 11 }}>Drives</span>}
+            {data?.parts.length === 0 && <span className="muted mono" style={{ fontSize: 11 }}>磁盘</span>}
             {data?.parts.map((p, i) => (
               <span key={p.path}>
                 <button
@@ -112,7 +112,7 @@ export function FolderPickerModal(props: Props) {
               setManualEntry((v) => !v);
               setManualPath(data?.cwd ?? '');
             }}
-            title="Type a path manually"
+            title="手动输入路径"
           >
             ⌨
           </button>
@@ -140,16 +140,16 @@ export function FolderPickerModal(props: Props) {
               }}
             />
             <button className="btn btn-sm btn-primary" onClick={submitManual} disabled={!manualPath.trim()}>
-              Open
+              打开
             </button>
           </div>
         )}
 
         <div className="picker-list">
           {error && <div className="msg-sys err" style={{ margin: 12 }}>{I.warn} {error}</div>}
-          {!error && !data && <div style={{ padding: 16, color: 'var(--ink-3)' }}>Loading…</div>}
+          {!error && !data && <div style={{ padding: 16, color: 'var(--ink-3)' }}>加载中…</div>}
           {data && data.entries.length === 0 && (
-            <div style={{ padding: 16, color: 'var(--ink-3)', fontSize: 12 }}>(empty)</div>
+            <div style={{ padding: 16, color: 'var(--ink-3)', fontSize: 12 }}>（空目录）</div>
           )}
           {data?.entries.map((e) => (
             <div
@@ -174,7 +174,7 @@ export function FolderPickerModal(props: Props) {
           <span className="info">
             {data?.cwd ? (
               <>
-                <span style={{ color: 'var(--ink-2)' }}>open: </span>
+                <span style={{ color: 'var(--ink-2)' }}>当前目录：</span>
                 <code style={{ color: 'var(--ink-1)' }}>{data.cwd}</code>
                 {data.isProject && (
                   <span className={`pill engine ${data.engine}`} style={{ marginLeft: 8, fontSize: 10, padding: '1px 8px' }}>
@@ -183,7 +183,7 @@ export function FolderPickerModal(props: Props) {
                 )}
               </>
             ) : (
-              <span style={{ color: 'var(--ink-3)' }}>Pick a drive</span>
+              <span style={{ color: 'var(--ink-3)' }}>请选择磁盘</span>
             )}
           </span>
           <span className="grow" />
@@ -191,19 +191,19 @@ export function FolderPickerModal(props: Props) {
             <button
               className="btn btn-sm"
               onClick={() => setCreating(true)}
-              title="Scaffold a new project under the current folder"
+              title="在当前目录创建新项目"
             >
-              + New project
+              + 新建项目
             </button>
           )}
-          <button className="btn btn-sm" onClick={props.onCancel}>Cancel</button>
+          <button className="btn btn-sm" onClick={props.onCancel}>取消</button>
           <button
             className="btn btn-sm btn-primary"
             onClick={chooseCurrent}
             disabled={!data?.cwd}
-            title={data?.isProject ? 'Open this project folder' : 'Open this folder (will be treated as unknown engine)'}
+            title={data?.isProject ? '打开该项目文件夹' : '打开此文件夹（将按未知引擎处理）'}
           >
-            Open this folder
+            打开此文件夹
           </button>
         </div>
       </div>
@@ -216,18 +216,18 @@ export function FolderPickerModal(props: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-head">
-              <span className="title">Create new project</span>
+              <span className="title">创建新项目</span>
               <button className="close" onClick={() => setCreating(false)}>{I.close}</button>
             </div>
             <div style={{ padding: 18, display: 'grid', gap: 14 }}>
               <div style={{ display: 'grid', gap: 4 }}>
-                <label className="muted" style={{ fontSize: 11 }}>Parent folder</label>
+                <label className="muted" style={{ fontSize: 11 }}>父目录</label>
                 <code className="mono" style={{ fontSize: 11, color: 'var(--ink-1)' }}>
                   {data.cwd}
                 </code>
               </div>
               <div style={{ display: 'grid', gap: 4 }}>
-                <label className="muted" style={{ fontSize: 11 }}>Project name</label>
+                <label className="muted" style={{ fontSize: 11 }}>项目名称</label>
                 <input
                   autoFocus
                   type="text"
@@ -246,19 +246,19 @@ export function FolderPickerModal(props: Props) {
                 />
               </div>
               <div style={{ display: 'grid', gap: 6 }}>
-                <label className="muted" style={{ fontSize: 11 }}>Engine</label>
+                <label className="muted" style={{ fontSize: 11 }}>引擎</label>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <EngineRadio
                     value="web"
-                    label="Web (Canvas 2D)"
-                    sub="vanilla JS + JSON levels"
+                    label="Web（Canvas 2D）"
+                    sub="原生 JS + JSON 关卡"
                     checked={newEngine === 'web'}
                     onSelect={() => setNewEngine('web')}
                   />
                   <EngineRadio
                     value="godot"
                     label="Godot 4"
-                    sub="coming soon"
+                    sub="即将支持"
                     checked={false}
                     onSelect={() => undefined}
                     disabled
@@ -266,7 +266,7 @@ export function FolderPickerModal(props: Props) {
                   <EngineRadio
                     value="unity"
                     label="Unity"
-                    sub="coming soon"
+                    sub="即将支持"
                     checked={false}
                     onSelect={() => undefined}
                     disabled
@@ -276,7 +276,7 @@ export function FolderPickerModal(props: Props) {
             </div>
             <div className="modal-foot">
               <span className="grow" />
-              <button className="btn btn-sm" onClick={() => setCreating(false)}>Cancel</button>
+              <button className="btn btn-sm" onClick={() => setCreating(false)}>取消</button>
               <button
                 className="btn btn-sm btn-primary"
                 disabled={!newName.trim()}
@@ -289,7 +289,7 @@ export function FolderPickerModal(props: Props) {
                   });
                 }}
               >
-                Create
+                创建
               </button>
             </div>
           </div>

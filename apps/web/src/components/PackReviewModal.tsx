@@ -86,7 +86,7 @@ export function PackReviewModal(props: Props) {
       if (r.failed.length > 0) {
         notify({
           kind: 'warn',
-          title: 'Some files failed to apply',
+          title: '部分文件应用失败',
           body: r.failed
             .slice(0, 5)
             .map((f) => `${f.relPath}: ${f.err}`)
@@ -108,7 +108,7 @@ export function PackReviewModal(props: Props) {
     } catch (err) {
       notify({
         kind: 'error',
-        title: 'Apply failed',
+        title: '应用失败',
         body: err instanceof Error ? err.message : String(err),
       });
     } finally {
@@ -119,9 +119,9 @@ export function PackReviewModal(props: Props) {
   async function doDiscard() {
     if (!active || busy) return;
     const ok = await confirm({
-      title: 'Discard pack?',
-      body: `This deletes the staged ${active.fileCount} files for ${active.packDir}. The live folder is untouched.`,
-      confirmLabel: 'Discard',
+      title: '丢弃动画包？',
+      body: `将删除 ${active.packDir} 对应的 ${active.fileCount} 个暂存文件。线上目录不会受影响。`,
+      confirmLabel: '丢弃',
       danger: true,
     });
     if (!ok) return;
@@ -137,7 +137,7 @@ export function PackReviewModal(props: Props) {
     } catch (err) {
       notify({
         kind: 'error',
-        title: 'Discard failed',
+        title: '丢弃失败',
         body: err instanceof Error ? err.message : String(err),
       });
     } finally {
@@ -158,12 +158,12 @@ export function PackReviewModal(props: Props) {
       >
         <div className="modal-head">
           <span style={{ color: 'var(--accent)' }}>{I.refresh}</span>
-          <span className="title">Review pack: {entity} / {action}</span>
+          <span className="title">审查动画包：{entity} / {action}</span>
           <span className="sub">
             {props.packs.length > 1 && (
-              <>{activeIdx + 1} of {props.packs.length} pending · </>
+              <>{activeIdx + 1} / {props.packs.length} 待处理 · </>
             )}
-            {active.fileCount} files
+            {active.fileCount} 个文件
           </span>
           <button className="close" onClick={busy ? undefined : props.onClose}>
             {I.close}
@@ -189,8 +189,8 @@ export function PackReviewModal(props: Props) {
           {/* Sheet diff side-by-side */}
           <div className="pack-compare">
             <figure className="pack-side">
-              <figcaption>Original</figcaption>
-              {preview?.loading && <div className="muted mono">loading…</div>}
+              <figcaption>原图</figcaption>
+              {preview?.loading && <div className="muted mono">加载中…</div>}
               {preview && !preview.loading && preview.liveSheetUrl && (
                 <img
                   src={preview.liveSheetUrl}
@@ -199,12 +199,12 @@ export function PackReviewModal(props: Props) {
                 />
               )}
               {preview && !preview.loading && !preview.liveSheetUrl && (
-                <div className="muted mono">no live sheet</div>
+                <div className="muted mono">无线上图集</div>
               )}
             </figure>
             <figure className="pack-side pack-side-new">
-              <figcaption>New</figcaption>
-              {preview?.loading && <div className="muted mono">loading…</div>}
+              <figcaption>新图</figcaption>
+              {preview?.loading && <div className="muted mono">加载中…</div>}
               {preview && !preview.loading && preview.stagingSheetUrl && (
                 <img
                   src={preview.stagingSheetUrl}
@@ -213,7 +213,7 @@ export function PackReviewModal(props: Props) {
                 />
               )}
               {preview && !preview.loading && !preview.stagingSheetUrl && (
-                <div className="muted mono">no staging sheet</div>
+                <div className="muted mono">无暂存图集</div>
               )}
             </figure>
           </div>
@@ -222,20 +222,20 @@ export function PackReviewModal(props: Props) {
           <div className="pack-layout-diff">
             <div className="pack-layout-row pack-layout-head">
               <span></span>
-              <span>Original</span>
-              <span>New</span>
+              <span>原值</span>
+              <span>新值</span>
             </div>
-            <LayoutRow label="Frames" live={active.liveLayout?.frames} stage={active.stagingLayout?.frames} />
+            <LayoutRow label="帧数" live={active.liveLayout?.frames} stage={active.stagingLayout?.frames} />
             <LayoutRow
-              label="Grid"
+              label="网格"
               live={fmtGrid(active.liveLayout)}
               stage={fmtGrid(active.stagingLayout)}
               isString
             />
-            <LayoutRow label="Cell size" live={active.liveLayout?.cellSize} stage={active.stagingLayout?.cellSize} suffix="px" />
+            <LayoutRow label="单元格尺寸" live={active.liveLayout?.cellSize} stage={active.stagingLayout?.cellSize} suffix="px" />
             <LayoutRow label="FPS" live={active.liveLayout?.fps} stage={active.stagingLayout?.fps} />
             <LayoutRow
-              label="Anchor"
+              label="锚点"
               live={active.liveLayout?.anchor}
               stage={active.stagingLayout?.anchor}
               isString
@@ -250,8 +250,7 @@ export function PackReviewModal(props: Props) {
                 onChange={(e) => setAutoCodeUpdate(e.target.checked)}
               />
               <span>
-                Layout changed — auto-fire a follow-up turn to patch slicing
-                in code/data after apply
+                布局已变化，应用后自动发起后续回合更新代码/数据中的切片参数
               </span>
             </label>
           )}
@@ -259,7 +258,7 @@ export function PackReviewModal(props: Props) {
 
         <div className="modal-foot">
           <button className="btn btn-sm" onClick={doDiscard} disabled={busy !== null}>
-            {busy === 'discard' ? 'Discarding…' : 'Discard pack'}
+            {busy === 'discard' ? '丢弃中…' : '丢弃动画包'}
           </button>
           <span className="grow" />
           <button
@@ -267,7 +266,7 @@ export function PackReviewModal(props: Props) {
             onClick={doApply}
             disabled={busy !== null}
           >
-            {busy === 'apply' ? 'Applying…' : `Apply pack (${active.fileCount} files)`}
+            {busy === 'apply' ? '应用中…' : `应用动画包（${active.fileCount} 个文件）`}
           </button>
         </div>
       </div>
@@ -297,7 +296,7 @@ function LayoutRow({
       <span className="mono">{liveStr}</span>
       <span className="mono">
         {stageStr}
-        {changed && <span className="pill" style={{ marginLeft: 6 }}>changed</span>}
+        {changed && <span className="pill" style={{ marginLeft: 6 }}>已变更</span>}
       </span>
     </div>
   );

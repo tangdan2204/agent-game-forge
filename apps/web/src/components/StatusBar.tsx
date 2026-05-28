@@ -10,12 +10,12 @@ interface Props {
 
 export function StatusBar(props: Props) {
   const codexLabel = props.agent?.version ? props.agent.version.replace(/^codex-cli\s*/, 'Codex ') : 'Codex —';
-  const engineLabel = props.project ? engineDisplay(props.project.engine) : 'no project';
+  const engineLabel = props.project ? engineDisplay(props.project.engine) : '未打开项目';
   const projectPath = props.project?.path ?? '';
 
   return (
     <div className="statusbar">
-      <span className="group" title={props.agent?.path ?? 'Codex agent'}>
+      <span className="group" title={props.agent?.path ?? 'Codex 代理'}>
         <span className="dot" />
         <span>{codexLabel}</span>
       </span>
@@ -25,10 +25,10 @@ export function StatusBar(props: Props) {
         </span>
       )}
       <span className="group">
-        <span>{props.filesChanged} files changed</span>
+        <span>已变更 {props.filesChanged} 个文件</span>
       </span>
       <span className="group">
-        <span>last run {props.lastRunLabel ?? '—'}</span>
+        <span>上次运行 {props.lastRunLabel ?? '—'}</span>
       </span>
       {props.isStreaming && (
         <span className="group" style={{ color: 'var(--accent)' }}>
@@ -43,7 +43,7 @@ export function StatusBar(props: Props) {
               animation: 'pulse 1s ease-in-out infinite',
             }}
           />
-          generating…
+          生成中…
         </span>
       )}
       <span className="right">
@@ -58,8 +58,8 @@ export function StatusBar(props: Props) {
 function engineDisplay(engine: string): string {
   if (engine === 'godot') return 'Godot';
   if (engine === 'unity') return 'Unity';
-  if (engine === 'web') return 'Web';
-  return 'unknown';
+  if (engine === 'web') return '网页';
+  return '未知';
 }
 
 function shortenPath(p: string): string {

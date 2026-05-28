@@ -38,14 +38,14 @@ const ROWS: SecretRowSpec[] = [
   },
   {
     key: 'gemini_api_key',
-    label: 'Google Gemini',
-    hint: 'Gemini 2.5 Flash Image (Nano Banana)',
+    label: 'Gemini',
+    hint: 'Gemini 2.5 Flash Image（Nano Banana）',
     placeholder: 'AIza…',
   },
   {
     key: 'anthropic_api_key',
     label: 'Anthropic',
-    hint: 'Reserved for the future Claude Code agent (no image-gen API).',
+    hint: '预留给未来 Claude Code 智能体（当前无图像生成 API）。',
     placeholder: 'sk-ant-…',
   },
 ];
@@ -165,12 +165,12 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   // a model that's not in this dropdown.
   const GEMINI_MODELS = [
     { id: 'gemini-2.5-flash-image', label: 'Gemini 2.5 Flash Image · GA' },
-    { id: 'gemini-2.5-flash-image-preview', label: 'Gemini 2.5 Flash Image · preview' },
+    { id: 'gemini-2.5-flash-image-preview', label: 'Gemini 2.5 Flash Image · 预览版' },
   ];
   const OPENAI_MODELS = [
     { id: 'gpt-image-1', label: 'gpt-image-1 · GA' },
-    { id: 'gpt-image-1-mini', label: 'gpt-image-1-mini · cheap & fast' },
-    { id: 'gpt-image-2', label: 'gpt-image-2 · newer (if available)' },
+    { id: 'gpt-image-1-mini', label: 'gpt-image-1-mini · 更便宜更快' },
+    { id: 'gpt-image-2', label: 'gpt-image-2 · 更新（若可用）' },
   ];
 
   async function save(key: SecretKey, value: string | null) {
@@ -186,7 +186,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('setSecret failed', err);
-      alert('Failed to save — see console.');
+      alert('保存失败，请查看控制台。');
     } finally {
       setSaving((s) => ({ ...s, [key]: false }));
     }
@@ -200,7 +200,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-head">
-          <span className="title">Settings</span>
+          <span className="title">设置</span>
           <button className="close" onClick={onClose}>
             {I.close}
           </button>
@@ -209,16 +209,14 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           {/* Agent CLI picker */}
           <section style={{ display: 'grid', gap: 6 }}>
             <h3 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'var(--ink-0)' }}>
-              Agent CLI
+              智能体 CLI
             </h3>
             <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.5 }}>
-              <strong>Default for NEW conversations</strong> — existing
-              conversations stay on the CLI that created them, and selecting
-              an old conversation snaps the active CLI back to its original
-              one (to start fresh under another CLI, create a new
-              conversation). Codex uses its built-in image-gen; Claude Code
-              routes images through the daemon's{' '}
-              <code>/api/gen-image</code> using your API keys below.
+              <strong>新会话默认使用</strong>此处选择的 CLI。已有会话会保持创建它的 CLI；
+              当你切回旧会话时，活动 CLI 会自动切回原值（若想在另一 CLI 下重新开始，请新建会话）。
+              Codex 使用内置图像生成功能；Claude Code 会通过 daemon 的{' '}
+              <code>/api/gen-image</code> 并使用下方 API Key。模型列表包含 AIGW 顶级模型 ID，
+              仅在本地 Codex/Claude CLI 已配置 AIGW 兼容网关或代理时使用。
             </p>
           </section>
           <div style={{ display: 'grid', gap: 8 }}>
@@ -272,7 +270,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                         color: available ? 'var(--green, #6ee78e)' : 'var(--ink-3)',
                       }}
                     >
-                      {available ? 'installed' : 'not found'}
+                      {available ? '已安装' : '未找到'}
                     </span>
                   </div>
                   {!available && (
@@ -280,8 +278,8 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                       className="muted"
                       style={{ margin: 0, marginLeft: 26, fontSize: 11, lineHeight: 1.4 }}
                     >
-                      Install with <code>npm i -g {id === 'codex' ? '@openai/codex' : '@anthropic-ai/claude-code'}</code>{' '}
-                      and reload OGF.
+                      使用 <code>npm i -g {id === 'codex' ? '@openai/codex' : '@anthropic-ai/claude-code'}</code>{' '}
+                      安装后重载 OGF。
                     </p>
                   )}
                 </label>
@@ -298,14 +296,14 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                 color: 'var(--ink-0)',
               }}
             >
-              Image generation API keys
+              图像生成 API Key
             </h3>
             <p
               className="muted"
               style={{ margin: 0, fontSize: 11, lineHeight: 1.5 }}
             >
-              For agents without built-in image gen. Codex CLI users keep using
-              Codex's <code>image_gen</code>.
+              用于没有内置图像生成能力的智能体。Codex CLI 用户仍使用
+              Codex 的 <code>image_gen</code>。
             </p>
           </section>
 
@@ -347,12 +345,12 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                       <span
                         style={{
                           ...badgeBase,
-                          background: 'var(--accent-soft)',
+                        background: 'var(--accent-soft)',
                           color: 'var(--accent)',
                         }}
-                        title={`Shadowed by env var ${status.envVarName} — unset that to use this UI`}
+                        title={`被环境变量 ${status.envVarName} 覆盖，取消该变量后才可使用此界面`}
                       >
-                        env
+                        环境变量
                       </span>
                     ) : status?.set ? (
                       <span
@@ -362,7 +360,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                           color: 'var(--green, #6ee78e)',
                         }}
                       >
-                        saved
+                        已保存
                       </span>
                     ) : (
                       <span
@@ -372,7 +370,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                           color: 'var(--ink-3)',
                         }}
                       >
-                        not set
+                        未设置
                       </span>
                     )}
                   </div>
@@ -383,7 +381,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                       type={reveal ? 'text' : 'password'}
                       placeholder={
                         status?.fromEnv
-                          ? `(from ${status.envVarName})`
+                          ? `（来自 ${status.envVarName}）`
                           : status?.set
                             ? status.masked
                             : row.placeholder
@@ -406,10 +404,10 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                         onClick={() =>
                           setRevealing((r) => ({ ...r, [row.key]: !reveal }))
                         }
-                        title={reveal ? 'Hide' : 'Show'}
+                        title={reveal ? '隐藏' : '显示'}
                         disabled={isSaving}
                       >
-                        {reveal ? 'hide' : 'show'}
+                        {reveal ? '隐藏' : '显示'}
                       </button>
                     )}
                     {isEditing ? (
@@ -419,7 +417,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                           onClick={() => void save(row.key, draft ?? '')}
                           disabled={isSaving || !draft}
                         >
-                          {isSaving ? 'saving…' : 'save'}
+                          {isSaving ? '保存中…' : '保存'}
                         </button>
                         <button
                           className="btn btn-sm btn-ghost"
@@ -432,7 +430,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                           }
                           disabled={isSaving}
                         >
-                          cancel
+                          取消
                         </button>
                       </>
                     ) : (
@@ -442,9 +440,9 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                           className="btn btn-sm btn-ghost"
                           onClick={() => void save(row.key, null)}
                           disabled={isSaving}
-                          title="Remove this key"
+                          title="移除该 Key"
                         >
-                          clear
+                          清空
                         </button>
                       )
                     )}
@@ -461,8 +459,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                         fontFamily: 'var(--font-mono)',
                       }}
                     >
-                      Override via <code>{status.envVarName}</code>. Unset that env var to
-                      use a value saved here.
+                      当前受 <code>{status.envVarName}</code> 覆盖。取消该环境变量后才会使用这里保存的值。
                     </p>
                   )}
                 </div>
@@ -491,14 +488,13 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                     color: 'var(--ink-0)',
                   }}
                 >
-                  Image-gen defaults
+                  图像生成默认设置
                 </h3>
                 <p
                   className="muted"
                   style={{ margin: '4px 0 0', fontSize: 11, lineHeight: 1.5 }}
                 >
-                  Which provider and model the daemon uses when the agent
-                  doesn't pin them per-call.
+                  当智能体请求里未指定 provider/model 时，daemon 将使用这里的默认值。
                 </p>
               </div>
 
@@ -511,23 +507,23 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                     color: 'var(--ink-0)',
                   }}
                 >
-                  Provider
+                  提供商
                 </div>
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                   {(['auto', 'gemini', 'openai'] as const).map((p) => {
                     const checked = prefs.image_gen.provider === p;
                     const label =
                       p === 'auto'
-                        ? 'Auto'
+                        ? '自动'
                         : p === 'gemini'
                           ? 'Gemini'
                           : 'OpenAI';
                     const hint =
                       p === 'auto'
-                        ? 'pick whichever has a key (Gemini first)'
+                        ? '自动选择可用 Key（优先 Gemini）'
                         : p === 'gemini'
-                          ? 'native multimodal, cheaper'
-                          : 'wider model selection';
+                          ? '原生多模态，成本更低'
+                          : '模型选择更广';
                     return (
                       <label
                         key={p}
@@ -570,7 +566,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                     color: 'var(--ink-0)',
                   }}
                 >
-                  Default model
+                  默认模型
                 </div>
                 <div style={{ display: 'grid', gap: 8 }}>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -596,7 +592,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                       ))}
                       {!GEMINI_MODELS.find((m) => m.id === prefs.image_gen.geminiModel) && (
                         <option value={prefs.image_gen.geminiModel}>
-                          {prefs.image_gen.geminiModel} · (custom)
+                          {prefs.image_gen.geminiModel} · （自定义）
                         </option>
                       )}
                     </select>
@@ -624,7 +620,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                       ))}
                       {!OPENAI_MODELS.find((m) => m.id === prefs.image_gen.openaiModel) && (
                         <option value={prefs.image_gen.openaiModel}>
-                          {prefs.image_gen.openaiModel} · (custom)
+                          {prefs.image_gen.openaiModel} · （自定义）
                         </option>
                       )}
                     </select>
@@ -634,8 +630,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                   className="muted"
                   style={{ margin: 0, fontSize: 10, lineHeight: 1.5 }}
                 >
-                  Need a model not listed? Edit{' '}
-                  <code>~/.ogf/preferences.json</code> directly.
+                  列表里没有想要的模型？可直接编辑 <code>~/.ogf/preferences.json</code>。
                 </p>
               </div>
             </section>
@@ -652,14 +647,14 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               }}
             >
               <h3
-                style={{
-                  margin: 0,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'var(--ink-0)',
-                }}
-              >
-                Image-gen usage · last 24h
+              style={{
+                margin: 0,
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--ink-0)',
+              }}
+            >
+                图像生成用量 · 最近 24 小时
               </h3>
               <div
                 style={{
@@ -678,10 +673,10 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                     <span style={{ minWidth: 60, color: 'var(--ink-0)' }}>
                       {row.provider}
                     </span>
-                    <span style={{ minWidth: 60 }}>{row.count} calls</span>
+                    <span style={{ minWidth: 60 }}>{row.count} 次调用</span>
                     {row.errorCount > 0 && (
                       <span style={{ color: 'var(--red, #ff6e6e)' }}>
-                        ({row.errorCount} fail)
+                        （失败 {row.errorCount} 次）
                       </span>
                     )}
                     <span style={{ flex: 1 }} />
@@ -700,7 +695,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                     fontWeight: 600,
                   }}
                 >
-                  <span>total</span>
+                  <span>总计</span>
                   <span style={{ flex: 1 }} />
                   <span>~${usage.totalEstCostUsd.toFixed(3)}</span>
                 </div>
@@ -709,8 +704,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                 className="muted"
                 style={{ margin: 0, fontSize: 10, lineHeight: 1.5 }}
               >
-                Cost is HEURISTIC (per-image list price × call count). Check
-                provider dashboard for actual billing.
+                成本为估算值（单图标价 × 调用次数），实际账单请以服务商后台为准。
               </p>
             </section>
           )}
@@ -725,9 +719,9 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               paddingTop: 14,
             }}
           >
-            Stored at <code>~/.ogf/secrets.json</code> (mode 600). Env vars
-            (<code>OPENAI_API_KEY</code>, <code>GEMINI_API_KEY</code>,{' '}
-            <code>ANTHROPIC_API_KEY</code>) override the file at runtime.
+            存储位置：<code>~/.ogf/secrets.json</code>（权限 600）。运行时环境变量
+            （<code>OPENAI_API_KEY</code>、<code>GEMINI_API_KEY</code>、
+            <code>ANTHROPIC_API_KEY</code>）会覆盖该文件值。
           </p>
         </div>
       </div>

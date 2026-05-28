@@ -22,7 +22,7 @@ export function ImportCodexSessionModal(props: Props) {
     fetchCodexSessions(props.projectPath)
       .then((r) => setSessions(r.sessions))
       .catch((e) =>
-        notify({ kind: 'error', title: 'Could not load sessions', body: e instanceof Error ? e.message : String(e) }),
+        notify({ kind: 'error', title: '无法加载会话列表', body: e instanceof Error ? e.message : String(e) }),
       )
       .finally(() => setLoading(false));
   }, [props.projectPath]);
@@ -38,12 +38,12 @@ export function ImportCodexSessionModal(props: Props) {
       });
       notify({
         kind: 'success',
-        title: 'Session imported',
-        body: `${r.importedCount} messages restored. Codex will resume with full memory.`,
+        title: '会话导入成功',
+        body: `已恢复 ${r.importedCount} 条消息。Codex 将以完整上下文继续。`,
       });
       props.onImported(r.conversation.id);
     } catch (e) {
-      notify({ kind: 'error', title: 'Import failed', body: e instanceof Error ? e.message : String(e) });
+      notify({ kind: 'error', title: '导入失败', body: e instanceof Error ? e.message : String(e) });
     } finally {
       setImporting(null);
     }
@@ -58,7 +58,7 @@ export function ImportCodexSessionModal(props: Props) {
       >
         <div className="modal-head">
           <span style={{ color: 'var(--accent)' }}>{I.branch}</span>
-          <span className="title">Import Codex session</span>
+          <span className="title">导入 Codex 会话</span>
           <span className="sub">{props.projectPath}</span>
           <button className="close" onClick={props.onClose}>{I.close}</button>
         </div>
@@ -66,16 +66,16 @@ export function ImportCodexSessionModal(props: Props) {
         <div style={{ overflow: 'auto', background: 'var(--bg-0)', padding: '8px 0' }}>
           {loading && (
             <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-3)' }}>
-              Scanning Codex sessions…
+              正在扫描 Codex 会话…
             </div>
           )}
           {!loading && sessions?.length === 0 && (
             <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-2)', fontSize: 13 }}>
               <div style={{ marginBottom: 8 }}>{I.spark}</div>
-              No Codex sessions found for this project folder.
+              当前项目目录未找到 Codex 会话。
               <br />
               <span style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 8, display: 'block' }}>
-                Sessions are stored in <code>~/.codex/sessions/</code> and matched by cwd.
+                会话存储在 <code>~/.codex/sessions/</code>，并按 cwd 匹配。
               </span>
             </div>
           )}
@@ -124,9 +124,9 @@ export function ImportCodexSessionModal(props: Props) {
                   </div>
                 )}
                 <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--font-mono)' }}>
-                  <span>{s.userMsgCount ?? '?'} user msgs</span>
-                  <span>{s.agentMsgCount ?? '?'} agent msgs</span>
-                  <span>{formatSize(s.fileSize)} rollout</span>
+                  <span>{s.userMsgCount ?? '?'} 条用户消息</span>
+                  <span>{s.agentMsgCount ?? '?'} 条智能体消息</span>
+                  <span>{formatSize(s.fileSize)} 轨迹</span>
                 </div>
               </div>
               <button
@@ -134,7 +134,7 @@ export function ImportCodexSessionModal(props: Props) {
                 disabled={importing === s.id}
                 onClick={() => void doImport(s)}
               >
-                {importing === s.id ? 'Importing…' : 'Import'}
+                {importing === s.id ? '导入中…' : '导入'}
               </button>
             </div>
           ))}
@@ -142,10 +142,10 @@ export function ImportCodexSessionModal(props: Props) {
 
         <div className="modal-foot" style={{ fontSize: 12, color: 'var(--ink-2)' }}>
           <span>
-            Importing replays user + agent text into OGF. Codex will resume with full rollout memory.
+            导入会把用户与智能体文本轨迹回放到 OGF，Codex 会带完整上下文继续。
           </span>
           <span className="grow" />
-          <button className="btn btn-sm" onClick={props.onClose}>Close</button>
+          <button className="btn btn-sm" onClick={props.onClose}>关闭</button>
         </div>
       </div>
     </div>

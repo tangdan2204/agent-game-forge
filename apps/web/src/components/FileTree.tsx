@@ -160,14 +160,14 @@ export function FileTree(props: Props) {
   return (
     <div className="tree-pane">
       <div className="tree-head">
-        <span>Project</span>
+        <span>项目</span>
         <span style={{ flex: 1 }} />
         {usedOnlyAvailable && (
           <button
             className={`icon-btn${effectiveUsedOnly ? ' active' : ''}`}
             onClick={() => setUsedOnly((v) => !v)}
             aria-pressed={effectiveUsedOnly}
-            title={effectiveUsedOnly ? 'Showing only used · click to show all' : 'Show only used assets'}
+            title={effectiveUsedOnly ? '当前仅显示已使用资源 · 点击显示全部' : '仅显示已使用资源'}
           >
             {effectiveUsedOnly ? I.check : I.view}
           </button>
@@ -175,23 +175,23 @@ export function FileTree(props: Props) {
         <button
           className="icon-btn"
           onClick={() => setOpenFolders(new Set())}
-          title="Collapse all"
+          title="全部折叠"
         >
           ⇲
         </button>
         {props.onNewFile && (
-          <button className="icon-btn" onClick={props.onNewFile} title="New file">
+          <button className="icon-btn" onClick={props.onNewFile} title="新建文件">
             {I.plus}
           </button>
         )}
         {props.onRefresh && (
-          <button className="icon-btn" onClick={props.onRefresh} title="Refresh">
+          <button className="icon-btn" onClick={props.onRefresh} title="刷新">
             {I.refresh}
           </button>
         )}
       </div>
       <div className="tree" role="tree">
-        {!props.tree && <div style={{ padding: 12, color: 'var(--ink-3)', fontSize: 11 }}>Loading…</div>}
+        {!props.tree && <div style={{ padding: 12, color: 'var(--ink-3)', fontSize: 11 }}>加载中…</div>}
         {props.tree && (
           <Node
             node={props.tree}
@@ -213,15 +213,15 @@ export function FileTree(props: Props) {
         )}
         {props.tree && isSearching && fileCount === 0 && (
           <div style={{ padding: '12px 14px', color: 'var(--ink-3)', fontSize: 11 }}>
-            No files match “{props.searchQuery}”.
+            未匹配到文件“{props.searchQuery}”。
           </div>
         )}
       </div>
       <div className="tree-foot">
-        <span>{fileCount} files{effectiveUsedOnly ? ' (used only)' : ''}</span>
+        <span>{fileCount} 个文件{effectiveUsedOnly ? '（仅已使用）' : ''}</span>
         <span style={{ flex: 1 }} />
         {props.usedAssets && !effectiveUsedOnly && (
-          <span style={{ color: 'var(--ink-3)' }}>· {props.usedAssets.size} used</span>
+          <span style={{ color: 'var(--ink-3)' }}>· 已使用 {props.usedAssets.size}</span>
         )}
       </div>
     </div>
@@ -321,25 +321,25 @@ function Node(props: {
       role="treeitem"
       title={
         node.relPath +
-        (isMain ? '  (main scene — runs on Play)' : '') +
-        (showUnused ? ' (not referenced anywhere)' : '')
+        (isMain ? '（主场景，会在 Play 中运行）' : '') +
+        (showUnused ? '（当前未被任何地方引用）' : '')
       }
     >
       <span className="twirl"></span>
       <span className="ficon">{fileIcon(node)}</span>
       <span className="name">{node.name}</span>
-      {isMain && <span className="main-badge" title="Main scene">main</span>}
+      {isMain && <span className="main-badge" title="主场景">主场景</span>}
       {isSceneFile && !isMain && (
-        <span className="scene-badge" title="Scene — opens in the Scenes tab as a draggable canvas">scene</span>
+        <span className="scene-badge" title="场景：在场景标签中以可拖拽画布打开">场景</span>
       )}
       {isDataFile && (
-        <span className="data-badge" title="Data file (catalog / manifest) — opens as code in Assets tab">data</span>
+        <span className="data-badge" title="数据文件（目录/清单），在资源标签以代码方式打开">数据</span>
       )}
-      {showUnused && <span className="unused-badge" title="Not referenced">unused</span>}
+      {showUnused && <span className="unused-badge" title="未引用">未引用</span>}
       {isUsed && isAsset && props.usedAssets && !isMain && (
-        <span className="used-dot" title="Referenced in project" />
+        <span className="used-dot" title="项目中已引用" />
       )}
-      {isChanged && <span className="stale-dot" title="Just regenerated" />}
+      {isChanged && <span className="stale-dot" title="刚刚重新生成" />}
     </div>
   );
 }

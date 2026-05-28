@@ -325,9 +325,9 @@ export function FileEditor(props: Props) {
     const packDir = props.relPath.replace(/\\/g, '/').split('/').slice(0, -1).join('/');
     if (!packDir) return;
     const ok = await confirm({
-      title: 'Apply pack?',
-      body: `Replace all files in ${packDir}/ with the staged versions. Other animations of this entity won't be touched.`,
-      confirmLabel: 'Apply pack',
+      title: '应用动画包？',
+      body: `将 ${packDir}/ 下全部文件替换为暂存版本。该实体的其他动作不会受影响。`,
+      confirmLabel: '应用动画包',
     });
     if (!ok) return;
     setRegenBusy('apply');
@@ -336,7 +336,7 @@ export function FileEditor(props: Props) {
       if (r.failed.length > 0) {
         notify({
           kind: 'warn',
-          title: 'Some files failed',
+          title: '部分文件处理失败',
           body: r.failed.slice(0, 5).map((f) => `${f.relPath}: ${f.err}`).join('\n'),
         });
       }
@@ -359,9 +359,9 @@ export function FileEditor(props: Props) {
     const packDir = props.relPath.replace(/\\/g, '/').split('/').slice(0, -1).join('/');
     if (!packDir) return;
     const ok = await confirm({
-      title: 'Discard pack?',
-      body: `Delete the staged files in .ogf/regen/${packDir}/. The live folder is untouched.`,
-      confirmLabel: 'Discard',
+      title: '丢弃动画包？',
+      body: `将删除 .ogf/regen/${packDir}/ 下的暂存文件。线上目录不会被修改。`,
+      confirmLabel: '丢弃',
       danger: true,
     });
     if (!ok) return;
@@ -579,11 +579,11 @@ Show me the diff before applying.`;
         ))}
         <span className="last">{segments[segments.length - 1] ?? props.relPath}</span>
         <span className="badge-dim">
-          {isImage && naturalW > 0 ? `${naturalW}×${naturalH}` : formatSize(size)} · {kind}
+          {isImage && naturalW > 0 ? `${naturalW}×${naturalH}` : formatSize(size)} · {kind === 'text' ? '文本' : kind === 'image' ? '图片' : '二进制'}
         </span>
         {dirty && (
           <span className="badge-dim" style={{ color: 'var(--accent)', borderColor: 'var(--accent-line)' }}>
-            ● unsaved
+            ● 未保存
           </span>
         )}
         <span className="actions">
@@ -592,16 +592,16 @@ Show me the diff before applying.`;
               <button
                 className={`view-toggle-btn ${showAsTable ? 'active' : ''}`}
                 onClick={() => setJsonView('table')}
-                title="Edit as a table"
+                title="按表格编辑"
               >
-                table
+                表格
               </button>
               <button
                 className={`view-toggle-btn ${!showAsTable ? 'active' : ''}`}
                 onClick={() => setJsonView('text')}
-                title="Edit as raw JSON"
+                title="按原始 JSON 编辑"
               >
-                text
+                文本
               </button>
             </span>
           )}
@@ -611,25 +611,25 @@ Show me the diff before applying.`;
               onClick={() => void save()}
               disabled={!dirty || saving}
             >
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? '保存中…' : '保存'}
             </button>
           )}
           {isImage && props.onAskCodex && (
             <button
               className="btn btn-sm"
               onClick={openRegenerateOptions}
-              title="Regenerate this sprite — set frames / grid / aspect / hint"
+              title="重生成此精灵，可设置帧数/网格/长宽比/说明"
             >
-              {I.refresh} Regenerate
+              {I.refresh} 重生成
             </button>
           )}
           {isImage && (
             <button className="btn btn-sm" onClick={() => setShowSlicer(true)}>
-              {I.scissors} {slice ? 'Edit slicing' : 'Define slicing'}
+              {I.scissors} {slice ? '编辑切片' : '定义切片'}
             </button>
           )}
           {props.onClose && (
-            <button className="btn btn-sm btn-ghost" onClick={props.onClose} title="Close">
+            <button className="btn btn-sm btn-ghost" onClick={props.onClose} title="关闭">
               {I.close}
             </button>
           )}
@@ -640,17 +640,17 @@ Show me the diff before applying.`;
         <div className="diff-banner" style={{ position: 'static', margin: '12px 14px 0' }}>
           <span className="dot" />
           <span className="text">
-            <b>Codex</b> regenerated this file <span className="when">just now</span>
+            <b>Codex</b> 刚刚重生成了这个文件 <span className="when">刚刚</span>
           </span>
           <span className="actions">
-            <button>View diff</button>
-            <button className="primary">Keep</button>
+            <button>查看差异</button>
+            <button className="primary">保留</button>
           </span>
         </div>
       )}
 
       {error && <div className="msg-sys err" style={{ margin: 12, alignSelf: 'flex-start' }}>{I.warn} {error}</div>}
-      {truncated && <div className="msg-sys" style={{ margin: 12, alignSelf: 'flex-start' }}>{I.warn} File too large ({formatSize(size)})</div>}
+      {truncated && <div className="msg-sys" style={{ margin: 12, alignSelf: 'flex-start' }}>{I.warn} 文件过大（{formatSize(size)}）</div>}
 
       {kind === 'text' && content !== null && showAsTable && (
         <div style={{ flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
@@ -696,10 +696,10 @@ Show me the diff before applying.`;
         <div className="pack-actionbar">
           <span className="pack-actionbar-icon">{I.refresh}</span>
           <div className="pack-actionbar-text">
-            <strong>Pending animation pack</strong>
+            <strong>待处理动画包</strong>
             <span className="muted">
-              Review the original vs new sheet below. Apply will atomically
-              replace all files in <code>{props.relPath.replace(/\\/g, '/').split('/').slice(0, -1).join('/')}/</code>.
+              请先对比下方原图与新图。点击应用后会原子替换
+              <code>{props.relPath.replace(/\\/g, '/').split('/').slice(0, -1).join('/')}/</code> 下全部文件。
             </span>
           </div>
           <button
@@ -707,15 +707,15 @@ Show me the diff before applying.`;
             onClick={discardPackFromHere}
             disabled={regenBusy !== null}
           >
-            {regenBusy === 'discard' ? 'Discarding…' : 'Discard pack'}
+            {regenBusy === 'discard' ? '丢弃中…' : '丢弃动画包'}
           </button>
           {props.onOpenPackReview && (
             <button
               className="btn btn-sm"
               onClick={props.onOpenPackReview}
-              title="Open the full pack browser (layout diff, multi-pack switch)"
+              title="打开完整动画包审查（布局差异、多包切换）"
             >
-              Review details
+              查看详情
             </button>
           )}
           <button
@@ -723,7 +723,7 @@ Show me the diff before applying.`;
             onClick={applyPackFromHere}
             disabled={regenBusy !== null}
           >
-            {regenBusy === 'apply' ? 'Applying…' : 'Apply pack'}
+            {regenBusy === 'apply' ? '应用中…' : '应用动画包'}
           </button>
         </div>
       )}
@@ -731,23 +731,23 @@ Show me the diff before applying.`;
       {isImage && imageUrl && regenBase64 && !inPendingPack && (
         <div className="regen-actionbar">
           <span className="regen-banner-icon">{I.refresh}</span>
-          <span>Pending regenerate — review before applying</span>
+          <span>待处理重生成结果，请先审核再应用</span>
           <span className="regen-banner-spacer" />
           <button
             className="btn btn-sm btn-primary"
             onClick={() => void applyRegenChange()}
             disabled={regenBusy !== null}
-            title="Replace the original with the new image"
+            title="用新图替换原图"
           >
-            {regenBusy === 'apply' ? 'Applying…' : 'Use new'}
+            {regenBusy === 'apply' ? '应用中…' : '使用新图'}
           </button>
           <button
             className="btn btn-sm"
             onClick={() => void discardRegenChange()}
             disabled={regenBusy !== null}
-            title="Throw away the regenerated image, keep the original"
+            title="丢弃重生成图片，保留原图"
           >
-            {regenBusy === 'discard' ? 'Discarding…' : 'Keep original'}
+            {regenBusy === 'discard' ? '丢弃中…' : '保留原图'}
           </button>
         </div>
       )}
@@ -758,7 +758,7 @@ Show me the diff before applying.`;
             {regenBase64 ? (
               <div className="regen-compare">
                 <figure className="regen-side">
-                  <figcaption>Original</figcaption>
+                  <figcaption>原图</figcaption>
                   <img
                     src={imageUrl}
                     alt="original"
@@ -780,7 +780,7 @@ Show me the diff before applying.`;
                   )}
                 </figure>
                 <figure className="regen-side regen-side-new">
-                  <figcaption>New</figcaption>
+                  <figcaption>新图</figcaption>
                   <img
                     src={`data:${mime};base64,${regenBase64}`}
                     alt="regenerated"
@@ -823,48 +823,48 @@ Show me the diff before applying.`;
 
             {!regenBase64 && (
               <div className="canvas-toolbar">
-                <button className="ico" onClick={() => setZoom((z) => Math.max(0.25, z - 0.25))} title="Zoom out">{I.zoomOut}</button>
+                <button className="ico" onClick={() => setZoom((z) => Math.max(0.25, z - 0.25))} title="缩小">{I.zoomOut}</button>
                 <span className="zoom-val">{Math.round(zoom * 100)}%</span>
-                <button className="ico" onClick={() => setZoom((z) => Math.min(6, z + 0.25))} title="Zoom in">{I.zoomIn}</button>
+                <button className="ico" onClick={() => setZoom((z) => Math.min(6, z + 0.25))} title="放大">{I.zoomIn}</button>
               </div>
             )}
           </div>
 
           <div className="meta-rail">
             <div className="meta-section">
-              <h4>File <span className="pill">{ext.toUpperCase()}</span></h4>
+              <h4>文件 <span className="pill">{ext.toUpperCase()}</span></h4>
               <dl className="kv">
-                <dt>Path</dt><dd style={{ wordBreak: 'break-all' }}>{props.relPath}</dd>
-                <dt>Size</dt><dd>{naturalW} × {naturalH}</dd>
-                <dt>Bytes</dt><dd>{formatSize(size)}</dd>
+                <dt>路径</dt><dd style={{ wordBreak: 'break-all' }}>{props.relPath}</dd>
+                <dt>尺寸</dt><dd>{naturalW} × {naturalH}</dd>
+                <dt>大小</dt><dd>{formatSize(size)}</dd>
               </dl>
             </div>
 
             <div className="meta-section">
               <h4>
-                Slicing
+                切片
                 {slice && (
-                  <span className="pill" title={`source: ${sliceSource}`}>
-                    {sliceSource === 'pipeline-meta' ? 'pipeline-meta' : sliceSource === 'ogf-slice' ? 'ogf-slice' : 'inferred'}
+                  <span className="pill" title={`来源: ${sliceSource}`}>
+                    {sliceSource === 'pipeline-meta' ? 'pipeline-meta' : sliceSource === 'ogf-slice' ? 'ogf-slice' : '推断'}
                   </span>
                 )}
               </h4>
               {slice ? (
                 <dl className="kv">
-                  <dt>Grid</dt><dd>{slice.cols} × {slice.rows}</dd>
-                  <dt>Frame</dt><dd>{slice.frameW ?? Math.round(naturalW / slice.cols)} × {slice.frameH ?? Math.round(naturalH / slice.rows)}</dd>
+                  <dt>网格</dt><dd>{slice.cols} × {slice.rows}</dd>
+                  <dt>单帧</dt><dd>{slice.frameW ?? Math.round(naturalW / slice.cols)} × {slice.frameH ?? Math.round(naturalH / slice.rows)}</dd>
                   <dt>FPS</dt><dd>{slice.fps}</dd>
-                  <dt>Anchor</dt><dd>{slice.anchor}</dd>
+                  <dt>锚点</dt><dd>{slice.anchor}</dd>
                   {(slice.padding > 0 || slice.offsetX !== 0 || slice.offsetY !== 0) && (
                     <>
-                      <dt>Padding</dt><dd>{slice.padding}px</dd>
-                      <dt>Offset</dt><dd>{slice.offsetX}, {slice.offsetY}</dd>
+                      <dt>内边距</dt><dd>{slice.padding}px</dd>
+                      <dt>偏移</dt><dd>{slice.offsetX}, {slice.offsetY}</dd>
                     </>
                   )}
                 </dl>
               ) : (
                 <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>
-                  No slicing metadata detected.
+                  未检测到切片元数据。
                 </div>
               )}
               <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
@@ -873,16 +873,16 @@ Show me the diff before applying.`;
                   style={{ flex: 1 }}
                   onClick={() => setShowSlicer(true)}
                 >
-                  {I.scissors} {slice ? 'Edit' : 'Define'}
+                  {I.scissors} {slice ? '编辑' : '定义'}
                 </button>
                 {slice && props.onAskCodex && (
                   <button
                     className="btn btn-sm btn-primary"
                     style={{ flex: 1 }}
                     onClick={() => askCodexToApplySlicing(slice)}
-                    title="Have Codex update the engine config to match this slicing"
+                    title="让 Codex 更新引擎配置以匹配该切片参数"
                   >
-                    {I.spark} Apply via Codex
+                    {I.spark} 通过 Codex 应用
                   </button>
                 )}
               </div>
@@ -890,14 +890,14 @@ Show me the diff before applying.`;
 
             {pipelineMeta && (
               <div className="meta-section">
-                <h4>Pipeline metadata <span className="pill">sprite_maker</span></h4>
+                <h4>流水线元数据 <span className="pill">sprite_maker</span></h4>
                 <dl className="kv">
-                  {pipelineMeta.target && <><dt>Target</dt><dd>{pipelineMeta.target}</dd></>}
-                  {pipelineMeta.mode && <><dt>Mode</dt><dd>{pipelineMeta.mode}</dd></>}
-                  {pipelineMeta.cell_size != null && <><dt>Cell</dt><dd>{pipelineMeta.cell_size}px</dd></>}
-                  {pipelineMeta.fit_scale != null && <><dt>Fit scale</dt><dd>{pipelineMeta.fit_scale}</dd></>}
-                  {pipelineMeta.duration != null && <><dt>Frame ms</dt><dd>{pipelineMeta.duration}</dd></>}
-                  {pipelineMeta.trim_border != null && <><dt>Trim</dt><dd>{pipelineMeta.trim_border}px</dd></>}
+                  {pipelineMeta.target && <><dt>目标</dt><dd>{pipelineMeta.target}</dd></>}
+                  {pipelineMeta.mode && <><dt>模式</dt><dd>{pipelineMeta.mode}</dd></>}
+                  {pipelineMeta.cell_size != null && <><dt>单元格</dt><dd>{pipelineMeta.cell_size}px</dd></>}
+                  {pipelineMeta.fit_scale != null && <><dt>适配缩放</dt><dd>{pipelineMeta.fit_scale}</dd></>}
+                  {pipelineMeta.duration != null && <><dt>帧时长(ms)</dt><dd>{pipelineMeta.duration}</dd></>}
+                  {pipelineMeta.trim_border != null && <><dt>裁边</dt><dd>{pipelineMeta.trim_border}px</dd></>}
                 </dl>
                 {pipelineMeta.prompt && (
                   <div style={{ marginTop: 8, fontSize: 11, color: 'var(--ink-2)', fontStyle: 'italic', borderTop: '1px solid var(--line)', paddingTop: 8 }}>
@@ -909,7 +909,7 @@ Show me the diff before applying.`;
 
             {slice && imageUrl && naturalW > 0 && (
               <div className="meta-section">
-                <h4>Animation preview</h4>
+                <h4>动画预览</h4>
                 <SpritePreview
                   imageUrl={imageUrl}
                   natW={naturalW}
@@ -921,12 +921,12 @@ Show me the diff before applying.`;
 
             <div className="meta-section">
               <h4>
-                Used by {usages && <span className="pill">{usages.length}</span>}
+                被引用 {usages && <span className="pill">{usages.length}</span>}
               </h4>
-              {usagesLoading && <div style={{ fontSize: 11, color: 'var(--ink-3)' }}>Scanning…</div>}
+              {usagesLoading && <div style={{ fontSize: 11, color: 'var(--ink-3)' }}>扫描中…</div>}
               {!usagesLoading && usages && usages.length === 0 && (
                 <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>
-                  Not referenced anywhere in the project.
+                  该文件在项目中暂无引用。
                 </div>
               )}
               {!usagesLoading && usages && usages.length > 0 && (
@@ -936,7 +936,7 @@ Show me the diff before applying.`;
                       key={i}
                       className="usage-row"
                       onClick={() => props.onJumpTo?.(u.file, u.line)}
-                      title={`Jump to ${u.file}:${u.line}`}
+                      title={`跳转到 ${u.file}:${u.line}`}
                     >
                       <div className="usage-path">
                         <span style={{ color: 'var(--ink-1)' }}>{u.file}</span>
@@ -954,7 +954,7 @@ Show me the diff before applying.`;
 
       {kind === 'binary' && (
         <div className="canvas-area" style={{ flex: 1 }}>
-          <div className="muted mono">Binary file · {formatSize(size)} · no preview</div>
+          <div className="muted mono">二进制文件 · {formatSize(size)} · 无预览</div>
         </div>
       )}
 
@@ -1048,7 +1048,7 @@ function SpritePreview({
         />
       </div>
       <div style={{ fontSize: 11, color: 'var(--ink-2)', fontFamily: 'var(--font-mono)' }}>
-        frame {frame} / {total - 1}
+        帧 {frame} / {total - 1}
         <br />
         {slice.fps} fps
       </div>

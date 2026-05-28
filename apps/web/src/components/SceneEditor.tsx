@@ -2281,18 +2281,18 @@ export function SceneEditor(props: Props) {
     <div className="inspector">
       <div className="crumbs">
         <span>{props.relPath}</span>
-        {scene && <span className="badge-dim">{scene.props.length} props</span>}
-        {scene && <span className="badge-dim">{scene.colliders.length} colliders</span>}
-        {scene && <span className="badge-dim">{scene.zones.length} zones</span>}
-        {scene && <span className="badge-dim">{scene.paths.length} paths</span>}
+        {scene && <span className="badge-dim">{scene.props.length} 物件</span>}
+        {scene && <span className="badge-dim">{scene.colliders.length} 碰撞体</span>}
+        {scene && <span className="badge-dim">{scene.zones.length} 区域</span>}
+        {scene && <span className="badge-dim">{scene.paths.length} 路径</span>}
         {threads.filter((t) => t.status === 'open').length > 0 && (
           <span className="badge-dim" style={{ color: 'var(--accent)' }}>
-            💬 {threads.filter((t) => t.status === 'open').length} open
+            💬 {threads.filter((t) => t.status === 'open').length} 未解决
           </span>
         )}
         {scene?.background && (
           <span className="badge-dim">
-            {scene.background.source === 'tilemap-preview' ? 'tilemap (preview)' : 'image bg'}
+            {scene.background.source === 'tilemap-preview' ? '瓦片图（预览）' : '图片背景'}
           </span>
         )}
         <span className="actions">
@@ -2307,16 +2307,16 @@ export function SceneEditor(props: Props) {
           <SaveBadge state={savingState} error={saveError} />
           <button
             className="btn btn-sm btn-ghost"
-            title="Fit scene to view"
+            title="适配到视图"
             onClick={fitToView}
             disabled={!scene}
           >
-            fit
+            适配
           </button>
           {props.onClose && (
             <button
               className="btn btn-sm btn-ghost"
-              title="Close scene"
+              title="关闭场景"
               onClick={props.onClose}
             >
               {I.close}
@@ -2395,10 +2395,10 @@ export function SceneEditor(props: Props) {
             />
           )}
           {loading && (
-            <div className="scene-overlay">Loading scene…</div>
+            <div className="scene-overlay">场景加载中…</div>
           )}
           {error && (
-            <div className="scene-overlay error">Could not load: {error}</div>
+            <div className="scene-overlay error">加载失败：{error}</div>
           )}
           {scene && scene.notes.length > 0 && (
             <div className="scene-notes">
@@ -2515,10 +2515,10 @@ function SaveBadge({
 }) {
   if (state === 'idle') return null;
   if (state === 'saving') {
-    return <span className="badge-dim" style={{ color: 'var(--ink-2)' }}>saving…</span>;
+    return <span className="badge-dim" style={{ color: 'var(--ink-2)' }}>保存中…</span>;
   }
   if (state === 'saved') {
-    return <span className="badge-dim" style={{ color: 'var(--green)' }}>saved</span>;
+    return <span className="badge-dim" style={{ color: 'var(--green)' }}>已保存</span>;
   }
   return (
     <span
@@ -2526,7 +2526,7 @@ function SaveBadge({
       style={{ color: 'var(--red)', borderColor: 'var(--red)' }}
       title={error ?? ''}
     >
-      save failed
+      保存失败
     </span>
   );
 }
@@ -2585,27 +2585,27 @@ function ScenePanel({
   return (
     <aside className="scene-panel">
       <div className="scene-panel-section">
-        <div className="scene-panel-title">Scene</div>
+        <div className="scene-panel-title">场景</div>
         {scene ? (
           <>
             <div className="scene-panel-row">
-              <span className="muted">root</span>
+              <span className="muted">根节点</span>
               <span className="mono">{scene.rootName}</span>
             </div>
             <div className="scene-panel-row">
-              <span className="muted">props</span>
+              <span className="muted">物件</span>
               <span className="mono">{scene.props.length}</span>
             </div>
             <div className="scene-panel-row">
-              <span className="muted">colliders</span>
+              <span className="muted">碰撞体</span>
               <span className="mono">
                 {scene.colliders.length}
-                {scene.collidersJsonPath ? ' (json)' : scene.colliders.length > 0 ? ' (tscn)' : ''}
+                {scene.collidersJsonPath ? '（JSON）' : scene.colliders.length > 0 ? '（TSCN）' : ''}
               </span>
             </div>
             {scene.background && (
               <div className="scene-panel-row">
-                <span className="muted">bg</span>
+                <span className="muted">背景</span>
                 <span className="mono" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {scene.background.relPath.split('/').pop()}
                 </span>
@@ -2613,13 +2613,13 @@ function ScenePanel({
             )}
           </>
         ) : (
-          <div className="muted">No scene loaded</div>
+          <div className="muted">未加载场景</div>
         )}
       </div>
 
       {mode === 'props' && (
         <div className="scene-panel-section" style={{ flex: 1, minHeight: 0 }}>
-          <div className="scene-panel-title">Props</div>
+          <div className="scene-panel-title">物件</div>
           <div className="scene-panel-list">
             {scene?.props.map((p) => {
               const locked = lockedNodePaths.has(p.nodePath);
@@ -2640,7 +2640,7 @@ function ScenePanel({
                   <button
                     type="button"
                     className={`scene-prop-lock ${locked ? 'on' : ''}`}
-                    title={locked ? 'Unlock — clicks pass through to this' : 'Lock — block clicks on this prop'}
+                    title={locked ? '解锁：点击可选中此物件' : '锁定：点击穿透此物件'}
                     onClick={(e) => {
                       e.stopPropagation();
                       onToggleLock(p.nodePath);
@@ -2653,7 +2653,7 @@ function ScenePanel({
             })}
             {scene && scene.props.length === 0 && (
               <div className="muted" style={{ padding: 8 }}>
-                No draggable props in this scene.
+                当前场景没有可拖拽物件。
               </div>
             )}
           </div>
@@ -2662,14 +2662,14 @@ function ScenePanel({
 
       {mode === 'colliders' && (
         <div className="scene-panel-section" style={{ flex: 1, minHeight: 0 }}>
-          <div className="scene-panel-title">Colliders</div>
+          <div className="scene-panel-title">碰撞体</div>
           <div className="scene-panel-list">
             {scene?.colliders.map((c) => (
               <button
                 key={c.uid}
                 className={`scene-prop-item ${selectedCollider?.uid === c.uid ? 'active' : ''}`}
                 onClick={() => onSelectCollider(c.uid)}
-                title={c.editable ? '' : 'Read-only — Phase 4 will add polygon editing'}
+                title={c.editable ? '' : '只读：第 4 阶段将支持多边形编辑'}
               >
                 <span className="mono">
                   {c.shape.kind === 'rect' ? '▭' : c.shape.kind === 'circle' ? '○' : '◇'} {c.name}
@@ -2680,7 +2680,7 @@ function ScenePanel({
             ))}
             {scene && scene.colliders.length === 0 && (
               <div className="muted" style={{ padding: 8 }}>
-                No colliders in this scene.
+                当前场景没有碰撞体。
               </div>
             )}
           </div>
@@ -2689,20 +2689,20 @@ function ScenePanel({
 
       {mode === 'props' && selectedProp && (
         <div className="scene-panel-section">
-          <div className="scene-panel-title">Selected prop</div>
+          <div className="scene-panel-title">已选物件</div>
           <div className="scene-panel-row">
-            <span className="muted">name</span>
+            <span className="muted">名称</span>
             <span className="mono">{selectedProp.name}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">position</span>
+            <span className="muted">位置</span>
             <span className="mono">
               ({Math.round(selectedProp.position.x)}, {Math.round(selectedProp.position.y)})
             </span>
           </div>
           {selectedProp.texture && (
             <div className="scene-panel-row">
-              <span className="muted">texture</span>
+              <span className="muted">贴图</span>
               <span className="mono" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {selectedProp.texture.split('/').pop()}
               </span>
@@ -2710,7 +2710,7 @@ function ScenePanel({
           )}
           {Object.entries(selectedProp.metadata).length > 0 && (
             <>
-              <div className="scene-panel-title sub">metadata</div>
+              <div className="scene-panel-title sub">元数据</div>
               {Object.entries(selectedProp.metadata).map(([k, v]) => (
                 <div className="scene-panel-row" key={k}>
                   <span className="muted">{k}</span>
@@ -2724,14 +2724,14 @@ function ScenePanel({
 
       {mode === 'zones' && (
         <div className="scene-panel-section" style={{ flex: 1, minHeight: 0 }}>
-          <div className="scene-panel-title">Zones</div>
+          <div className="scene-panel-title">区域</div>
           <div className="scene-panel-list">
             {scene?.zones.map((z) => (
               <button
                 key={z.uid}
                 className={`scene-prop-item ${selectedZone?.uid === z.uid ? 'active' : ''}`}
                 onClick={() => onSelectZone(z.uid)}
-                title={z.editable ? '' : 'Read-only'}
+                title={z.editable ? '' : '只读'}
               >
                 <span className="mono">
                   {zoneIcon(z.zoneKind)} {z.name}
@@ -2741,7 +2741,7 @@ function ScenePanel({
             ))}
             {scene && scene.zones.length === 0 && (
               <div className="muted" style={{ padding: 8 }}>
-                No zones in this scene.
+                当前场景没有区域。
               </div>
             )}
           </div>
@@ -2750,28 +2750,28 @@ function ScenePanel({
 
       {mode === 'zones' && selectedZone && (
         <div className="scene-panel-section">
-          <div className="scene-panel-title">Selected zone</div>
+          <div className="scene-panel-title">已选区域</div>
           <div className="scene-panel-row">
-            <span className="muted">name</span>
+            <span className="muted">名称</span>
             <span className="mono">{selectedZone.name}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">kind</span>
+            <span className="muted">类型</span>
             <span className="mono">{selectedZone.zoneKind}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">shape</span>
+            <span className="muted">形状</span>
             <span className="mono">{selectedZone.shape.kind}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">center</span>
+            <span className="muted">中心</span>
             <span className="mono">
               ({Math.round(selectedZone.position.x)}, {Math.round(selectedZone.position.y)})
             </span>
           </div>
           {selectedZone.shape.kind === 'rect' && (
             <div className="scene-panel-row">
-              <span className="muted">size</span>
+              <span className="muted">尺寸</span>
               <span className="mono">
                 {Math.round(selectedZone.shape.w)} × {Math.round(selectedZone.shape.h)}
               </span>
@@ -2779,13 +2779,13 @@ function ScenePanel({
           )}
           {selectedZone.shape.kind === 'circle' && (
             <div className="scene-panel-row">
-              <span className="muted">radius</span>
+              <span className="muted">半径</span>
               <span className="mono">{Math.round(selectedZone.shape.r)}</span>
             </div>
           )}
           {Object.entries(selectedZone.fields).length > 0 && (
             <>
-              <div className="scene-panel-title sub">fields</div>
+              <div className="scene-panel-title sub">字段</div>
               {Object.entries(selectedZone.fields).map(([k, v]) => (
                 <div className="scene-panel-row" key={k}>
                   <span className="muted">{k}</span>
@@ -2799,28 +2799,28 @@ function ScenePanel({
 
       {mode === 'colliders' && selectedCollider && (
         <div className="scene-panel-section">
-          <div className="scene-panel-title">Selected collider</div>
+          <div className="scene-panel-title">已选碰撞体</div>
           <div className="scene-panel-row">
-            <span className="muted">name</span>
+            <span className="muted">名称</span>
             <span className="mono">{selectedCollider.name}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">kind</span>
+            <span className="muted">类型</span>
             <span className="mono">{selectedCollider.kind || '—'}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">shape</span>
+            <span className="muted">形状</span>
             <span className="mono">{selectedCollider.shape.kind}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">center</span>
+            <span className="muted">中心</span>
             <span className="mono">
               ({Math.round(selectedCollider.position.x)}, {Math.round(selectedCollider.position.y)})
             </span>
           </div>
           {selectedCollider.shape.kind === 'rect' && (
             <div className="scene-panel-row">
-              <span className="muted">size</span>
+              <span className="muted">尺寸</span>
               <span className="mono">
                 {Math.round(selectedCollider.shape.w)} × {Math.round(selectedCollider.shape.h)}
               </span>
@@ -2828,19 +2828,19 @@ function ScenePanel({
           )}
           {selectedCollider.shape.kind === 'circle' && (
             <div className="scene-panel-row">
-              <span className="muted">radius</span>
+              <span className="muted">半径</span>
               <span className="mono">{Math.round(selectedCollider.shape.r)}</span>
             </div>
           )}
           {selectedCollider.shape.kind === 'polygon' && (
             <div className="scene-panel-row">
-              <span className="muted">points</span>
+              <span className="muted">顶点数</span>
               <span className="mono">{selectedCollider.shape.points.length}</span>
             </div>
           )}
           {!selectedCollider.editable && (
             <div className="muted" style={{ fontSize: 10.5, marginTop: 4 }}>
-              Polygon edit lands in Phase 4.
+              多边形编辑将在第 4 阶段支持。
             </div>
           )}
         </div>
@@ -2849,23 +2849,23 @@ function ScenePanel({
       {mode === 'comments' && !selThread && (
         <div className="scene-panel-section" style={{ flex: 1, minHeight: 0 }}>
           <div className="scene-panel-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ flex: 1 }}>Comments</span>
+            <span style={{ flex: 1 }}>评论</span>
             {resolvedCount > 0 && (
               <button
                 className="btn btn-sm btn-ghost"
                 onClick={onToggleShowResolved}
-                title={showResolved ? 'Hide resolved threads' : 'Show resolved threads too'}
+                title={showResolved ? '隐藏已解决评论' : '同时显示已解决评论'}
                 style={{ fontSize: 10, padding: '2px 6px' }}
               >
-                {showResolved ? `hide ${resolvedCount} resolved` : `${resolvedCount} resolved`}
+                {showResolved ? `隐藏 ${resolvedCount} 个已解决` : `${resolvedCount} 个已解决`}
               </button>
             )}
           </div>
           <div className="scene-panel-list">
             {threads.length === 0 ? (
               <div className="muted" style={{ padding: 8, lineHeight: 1.5 }}>
-                Click on a prop / collider / zone to attach a comment to it.
-                Click empty canvas for a free pin. Hold Shift to force a free pin.
+                点击物件/碰撞体/区域可挂载评论。
+                点击空白画布可创建自由标记。按住 Shift 可强制自由标记。
               </div>
             ) : (
               threads.map((t) => (
@@ -2886,7 +2886,7 @@ function ScenePanel({
                   >
                     {t.status === 'resolved' ? '✓' : '💬'}
                     {t.anchor.kind === 'node' ? ' ⚓' : ''}{' '}
-                    {t.messages[0]?.text.slice(0, 36) ?? '(empty)'}
+                    {t.messages[0]?.text.slice(0, 36) ?? '（空）'}
                   </span>
                   <span className="muted mono" style={{ fontSize: 10 }}>
                     {t.messages.length}
@@ -2911,21 +2911,21 @@ function ScenePanel({
 
       {mode === 'paths' && (
         <div className="scene-panel-section" style={{ flex: 1, minHeight: 0 }}>
-          <div className="scene-panel-title">Paths</div>
+          <div className="scene-panel-title">路径</div>
           <div className="scene-panel-list">
             {scene?.paths.map((p) => (
               <button
                 key={p.uid}
                 className={`scene-prop-item ${selectedPath?.uid === p.uid ? 'active' : ''}`}
                 onClick={() => onSelectPath(p.uid)}
-                title={p.hasBezierHandles ? 'Has bezier handles — straight-line edits preserve them' : ''}
+                title={p.hasBezierHandles ? '含贝塞尔控制柄：直线拖拽会保留控制柄' : ''}
               >
                 <span className="mono">⌒ {p.name}</span>
-                <span className="muted mono">{p.points.length} pts</span>
+                <span className="muted mono">{p.points.length} 点</span>
               </button>
             ))}
             {scene && scene.paths.length === 0 && (
-              <div className="muted" style={{ padding: 8 }}>No Path2D nodes in this scene.</div>
+              <div className="muted" style={{ padding: 8 }}>当前场景没有 Path2D 节点。</div>
             )}
           </div>
         </div>
@@ -2933,29 +2933,29 @@ function ScenePanel({
 
       {mode === 'paths' && selPath && (
         <div className="scene-panel-section">
-          <div className="scene-panel-title">Selected path</div>
+          <div className="scene-panel-title">已选路径</div>
           <div className="scene-panel-row">
-            <span className="muted">name</span>
+            <span className="muted">名称</span>
             <span className="mono">{selPath.name}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">points</span>
+            <span className="muted">点数</span>
             <span className="mono">{selPath.points.length}</span>
           </div>
           <div className="scene-panel-row">
-            <span className="muted">origin</span>
+            <span className="muted">原点</span>
             <span className="mono">
               ({Math.round(selPath.origin.x)}, {Math.round(selPath.origin.y)})
             </span>
           </div>
           {selPath.hasBezierHandles && (
             <div className="muted" style={{ fontSize: 10.5, marginTop: 4 }}>
-              Bezier handles preserved — straight-line drag only.
+              已保留贝塞尔控制柄，仅支持直线拖拽。
             </div>
           )}
           {selectedPath?.pointIdx !== null && selectedPath?.pointIdx !== undefined && (
             <div className="scene-panel-row">
-              <span className="muted">point #{selectedPath.pointIdx}</span>
+              <span className="muted">点 #{selectedPath.pointIdx}</span>
               <span className="mono">
                 ({Math.round(selPath.points[selectedPath.pointIdx]?.x ?? 0)},{' '}
                 {Math.round(selPath.points[selectedPath.pointIdx]?.y ?? 0)})
@@ -2967,14 +2967,14 @@ function ScenePanel({
 
       <div className="scene-panel-foot muted">
         {mode === 'props'
-          ? 'Drag a prop to move. Drag empty space to pan. Wheel to zoom. Shift = sub-pixel.'
+          ? '拖动物件可移动。拖动画布空白可平移。滚轮缩放。Shift 可亚像素移动。'
           : mode === 'colliders'
-          ? 'Click a collider to select. Drag body to move, drag corner/handle to resize.'
+          ? '点击碰撞体可选中。拖动主体可移动，拖动角点/控制点可缩放。'
           : mode === 'zones'
-          ? 'Click a zone to select. Drag body to move, drag corner/handle to resize.'
+          ? '点击区域可选中。拖动主体可移动，拖动角点/控制点可缩放。'
           : mode === 'paths'
-          ? 'Click a path to select; drag any point to move it. Bezier handles are kept.'
-          : 'Click a node → anchored pin. Click empty canvas → free pin. Shift = always free. "Ask Codex" sends thread context to chat.'}
+          ? '点击路径可选中；拖动任一点可移动。会保留贝塞尔控制柄。'
+          : '点击节点可创建锚定标记。点击空白画布可创建自由标记。Shift 始终为自由标记。“询问 Codex”会把讨论上下文发送到聊天。'}
       </div>
     </aside>
   );
@@ -3039,7 +3039,7 @@ function CommentPopover({
           </span>
         )}
         <span style={{ flex: 1 }} />
-        <button className="comment-popover-x" onClick={onCancel} title="Cancel (Esc)">
+        <button className="comment-popover-x" onClick={onCancel} title="取消（Esc）">
           ×
         </button>
       </div>
@@ -3048,11 +3048,11 @@ function CommentPopover({
         rows={3}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="What about this?"
+        placeholder="这里需要怎么改？"
         className="comment-textarea"
       />
       <div className="comment-popover-foot">
-        <span className="muted">⌘⏎ post · Esc cancel</span>
+        <span className="muted">⌘⏎ 发送 · Esc 取消</span>
         <span style={{ flex: 1 }} />
         <button
           className="btn btn-sm btn-primary"
@@ -3065,7 +3065,7 @@ function CommentPopover({
             }
           }}
         >
-          Post
+          发送
         </button>
       </div>
     </div>
@@ -3113,11 +3113,11 @@ function CommentThreadPanel({
   return (
     <div className="scene-panel-section" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
       <div className="scene-panel-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <button className="btn btn-sm btn-ghost" onClick={onBack} title="Back to list">‹</button>
-        <span style={{ flex: 1 }}>Thread</span>
+        <button className="btn btn-sm btn-ghost" onClick={onBack} title="返回列表">‹</button>
+        <span style={{ flex: 1 }}>讨论串</span>
         <button
           className="btn btn-sm btn-ghost"
-          title={thread.status === 'resolved' ? 'Reopen' : 'Resolve'}
+          title={thread.status === 'resolved' ? '重新打开' : '标记解决'}
           onClick={() => onResolve(thread.status !== 'resolved')}
         >
           {thread.status === 'resolved' ? '↺' : '✓'}
@@ -3125,14 +3125,14 @@ function CommentThreadPanel({
         <button
           className="btn btn-sm btn-ghost"
           style={{ color: 'var(--red)' }}
-          title="Delete thread"
+          title="删除讨论串"
           onClick={onDelete}
         >
           ×
         </button>
       </div>
       <div className="scene-panel-row">
-        <span className="muted">at</span>
+        <span className="muted">位置</span>
         <span className="mono">{describeAnchor(thread.anchor)}</span>
       </div>
       <div className="comment-messages">
@@ -3153,16 +3153,16 @@ function CommentThreadPanel({
         rows={3}
         value={reply}
         onChange={(e) => setReply(e.target.value)}
-        placeholder="Reply to this thread…"
+        placeholder="回复这条讨论…"
         className="comment-textarea"
       />
       <div className="comment-buttons">
         <button
           className="btn btn-sm"
           onClick={() => onAskCodex(reply.trim() ? reply.trim() : undefined)}
-          title="Send thread context to chat composer"
+          title="将讨论上下文发送到聊天输入框"
         >
-          Ask Codex
+          询问 Codex
         </button>
         <span style={{ flex: 1 }} />
         <button
@@ -3175,7 +3175,7 @@ function CommentThreadPanel({
             }
           }}
         >
-          Reply
+          回复
         </button>
       </div>
     </div>
@@ -3185,13 +3185,13 @@ function CommentThreadPanel({
 function relativeTime(ts: number): string {
   const ms = Date.now() - ts;
   const s = Math.floor(ms / 1000);
-  if (s < 5) return 'just now';
-  if (s < 60) return `${s}s`;
+  if (s < 5) return '刚刚';
+  if (s < 60) return `${s}秒前`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `${m}分钟前`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  return `${Math.floor(h / 24)}d`;
+  if (h < 24) return `${h}小时前`;
+  return `${Math.floor(h / 24)}天前`;
 }
 
 // ============= Scene context dump =============
@@ -3413,8 +3413,8 @@ function findCommentPinAt(
 }
 
 function describeAnchor(anchor: CommentAnchor): string {
-  if (anchor.kind === 'node') return `node ${anchor.nodePath}`;
-  return `point (${Math.round(anchor.x)}, ${Math.round(anchor.y)})`;
+  if (anchor.kind === 'node') return `节点 ${anchor.nodePath}`;
+  return `点 (${Math.round(anchor.x)}, ${Math.round(anchor.y)})`;
 }
 
 /** Outline the node a comment-draft is anchored to, so the user has visual
@@ -3545,10 +3545,10 @@ function pickAnchorAt(world: Vec2, scene: SceneModel): CommentAnchor {
 
 function buildAskCodexPrompt(thread: CommentThread, latestUserMsg?: string): string {
   const lines: string[] = [];
-  lines.push(`[OGF comment thread on ${thread.scene}]`);
-  lines.push(`Anchor: ${describeAnchor(thread.anchor)}`);
+  lines.push(`[OGF 评论线程 @ ${thread.scene}]`);
+  lines.push(`锚点：${describeAnchor(thread.anchor)}`);
   if (thread.messages.length > 0) {
-    lines.push('Thread so far:');
+    lines.push('线程上下文：');
     for (const m of thread.messages) {
       lines.push(`  ${m.author}: ${m.text}`);
     }
@@ -3557,7 +3557,7 @@ function buildAskCodexPrompt(thread: CommentThread, latestUserMsg?: string): str
   if (latestUserMsg) {
     lines.push(latestUserMsg);
   } else {
-    lines.push('Please review the thread above and help with what the user is asking.');
+    lines.push('请阅读以上线程内容，并协助解决用户当前问题。');
   }
   return lines.join('\n');
 }
@@ -3592,7 +3592,7 @@ function UndoRedo({
         className="btn btn-sm btn-ghost"
         disabled={undoStack.length === 0}
         onClick={onUndo}
-        title={undoLabel ? `Undo: ${undoLabel}  (Ctrl+Z)` : 'Nothing to undo'}
+        title={undoLabel ? `撤销：${undoLabel}（Ctrl+Z）` : '无可撤销操作'}
       >
         ↶
       </button>
@@ -3600,7 +3600,7 @@ function UndoRedo({
         className="btn btn-sm btn-ghost"
         disabled={redoStack.length === 0}
         onClick={onRedo}
-        title={redoLabel ? `Redo: ${redoLabel}  (Ctrl+Shift+Z)` : 'Nothing to redo'}
+        title={redoLabel ? `重做：${redoLabel}（Ctrl+Shift+Z）` : '无可重做操作'}
       >
         ↷
       </button>
@@ -3677,18 +3677,18 @@ function ScenePalette({
           className="btn btn-sm"
           onClick={onCommitPolygonDraft}
           disabled={polygonDraft.points.length < 3}
-          title="Close polygon (Enter)"
+          title="闭合多边形（回车）"
         >
-          finish ({polygonDraft.points.length} pt)
+          完成（{polygonDraft.points.length} 点）
         </button>
         <button
           className="btn btn-sm btn-ghost"
           onClick={onCancelPolygonDraft}
-          title="Cancel (Esc)"
+          title="取消（Esc）"
         >
-          cancel
+          取消
         </button>
-        <span className="palette-hint">Click vertex · Backspace undo · Enter close</span>
+        <span className="palette-hint">点击顶点 · 退格撤销 · 回车闭合</span>
       </div>
     );
   }
@@ -3701,18 +3701,18 @@ function ScenePalette({
           className="btn btn-sm"
           onClick={onCommitPathDraft}
           disabled={pathDraft.points.length < 2}
-          title="Finish path (Enter)"
+          title="完成路径（回车）"
         >
-          finish ({pathDraft.points.length} pt)
+          完成（{pathDraft.points.length} 点）
         </button>
         <button
           className="btn btn-sm btn-ghost"
           onClick={onCancelPathDraft}
-          title="Cancel (Esc)"
+          title="取消（Esc）"
         >
-          cancel
+          取消
         </button>
-        <span className="palette-hint">Click waypoint · Backspace undo · Enter finish</span>
+        <span className="palette-hint">点击路径点 · 退格撤销 · 回车完成</span>
       </div>
     );
   }
@@ -3726,9 +3726,9 @@ function ScenePalette({
         key="add-prop"
         className="btn btn-sm"
         onClick={onOpenPropPicker}
-        title="Add a prop to this scene (image picker)"
+        title="向此场景添加物件（图片选择器）"
       >
-        + prop
+        + 物件
       </button>,
     );
     // + platform: only when this scene already has at least one platform
@@ -3747,9 +3747,9 @@ function ScenePalette({
           key="add-platform"
           className={`btn btn-sm ${addShapeKind === 'platform' ? 'active' : ''}`}
           onClick={() => setAddShapeKind((k) => (k === 'platform' ? null : 'platform'))}
-          title="Drag in empty space to draw a platform (copies tile from an existing one)"
+          title="在空白处拖拽绘制平台（复制现有平台的瓦片）"
         >
-          + platform
+          + 平台
         </button>,
       );
     }
@@ -3760,25 +3760,25 @@ function ScenePalette({
         key="add-rect"
         className={`btn btn-sm ${addShapeKind === 'rect' ? 'active' : ''}`}
         onClick={() => setAddShapeKind((k) => (k === 'rect' ? null : 'rect'))}
-        title="Drag in empty space to draw a rectangle blocker"
+        title="在空白处拖拽绘制矩形阻挡"
       >
-        + rect
+        + 矩形
       </button>,
       <button
         key="add-circle"
         className={`btn btn-sm ${addShapeKind === 'circle' ? 'active' : ''}`}
         onClick={() => setAddShapeKind((k) => (k === 'circle' ? null : 'circle'))}
-        title="Drag in empty space to draw a circle blocker"
+        title="在空白处拖拽绘制圆形阻挡"
       >
-        + circle
+        + 圆形
       </button>,
       <button
         key="add-poly"
         className={`btn btn-sm ${addShapeKind === 'polygon' ? 'active' : ''}`}
         onClick={() => setAddShapeKind((k) => (k === 'polygon' ? null : 'polygon'))}
-        title="Click to place each polygon vertex (≥ 3), Enter to close"
+        title="点击放置多边形顶点（≥3），回车闭合"
       >
-        + poly
+        + 多边形
       </button>,
     );
   }
@@ -3788,9 +3788,9 @@ function ScenePalette({
         key="add-path"
         className="btn btn-sm"
         onClick={onStartPathDraft}
-        title="Click in canvas to place each waypoint, Enter to finish"
+        title="在画布中点击放置路径点，回车完成"
       >
-        + path
+        + 路径
       </button>,
     );
   }
@@ -3817,11 +3817,11 @@ function ScenePalette({
           disabled={!canDelete}
           title={
             canDelete
-              ? `Delete selected ${mode === 'props' ? 'prop' : mode === 'colliders' ? 'collider' : mode === 'zones' ? 'zone' : mode === 'paths' ? 'path' : 'item'} (Del)`
-              : 'Select something to delete'
+              ? `删除已选${mode === 'props' ? '物件' : mode === 'colliders' ? '碰撞体' : mode === 'zones' ? '区域' : mode === 'paths' ? '路径' : '元素'}（Del）`
+              : '请先选择要删除的对象'
           }
         >
-          delete
+          删除
         </button>
       )}
     </div>
@@ -3921,15 +3921,15 @@ function PropPickerModal({
             gap: 8,
           }}
         >
-          <strong style={{ flex: 1 }}>Pick a prop image</strong>
-          <button className="btn btn-sm btn-ghost" onClick={onClose} title="Close (Esc)">
+          <strong style={{ flex: 1 }}>选择物件图片</strong>
+          <button className="btn btn-sm btn-ghost" onClick={onClose} title="关闭（Esc）">
             ✕
           </button>
         </div>
         <div style={{ padding: '8px 14px' }}>
           <input
             autoFocus
-            placeholder="Filter — e.g. throne, samurai, brazier"
+            placeholder="筛选关键词，例如：王座、武士、火盆"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             onKeyDown={(e) => {
@@ -3948,11 +3948,11 @@ function PropPickerModal({
         </div>
         <div style={{ overflow: 'auto', padding: '0 14px 14px', flex: 1 }}>
           {error && <div className="error">{error}</div>}
-          {!files && !error && <div className="muted">Loading…</div>}
+          {!files && !error && <div className="muted">加载中…</div>}
           {files && files.length === 0 && (
             <div className="muted">
-              No images under <code>assets/props/</code> or <code>assets/sprites/</code> yet —
-              run a generate step first.
+              <code>assets/props/</code> 或 <code>assets/sprites/</code> 下还没有图片，
+              请先执行生成步骤。
             </div>
           )}
           {visible.map((f) => (
@@ -3986,8 +3986,7 @@ function PropPickerModal({
             color: 'var(--fg-dim)',
           }}
         >
-          Click an image to drop it at the camera center. Drag to reposition,
-          Alt+drag a corner to scale non-uniformly.
+          点击图片会把它放到镜头中心。拖动可改位置，Alt+拖拽角点可非等比缩放。
         </div>
       </div>
     </div>
@@ -4002,45 +4001,45 @@ function ModeToggle({ mode, setMode }: { mode: EditMode; setMode: (m: EditMode) 
         aria-selected={mode === 'props'}
         onClick={() => setMode('props')}
         className={`scene-mode-btn ${mode === 'props' ? 'active' : ''}`}
-        title="Move props"
+        title="移动场景物件"
       >
-        props
+        物件
       </button>
       <button
         role="tab"
         aria-selected={mode === 'colliders'}
         onClick={() => setMode('colliders')}
         className={`scene-mode-btn ${mode === 'colliders' ? 'active' : ''}`}
-        title="Edit collision shapes"
+        title="编辑碰撞形状"
       >
-        colliders
+        碰撞体
       </button>
       <button
         role="tab"
         aria-selected={mode === 'zones'}
         onClick={() => setMode('zones')}
         className={`scene-mode-btn ${mode === 'zones' ? 'active' : ''}`}
-        title="Edit gameplay zones (encounter / exit / spawn)"
+        title="编辑玩法区域（遭遇 / 出口 / 出生点）"
       >
-        zones
+        区域
       </button>
       <button
         role="tab"
         aria-selected={mode === 'paths'}
         onClick={() => setMode('paths')}
         className={`scene-mode-btn ${mode === 'paths' ? 'active' : ''}`}
-        title="Edit Path2D points"
+        title="编辑 Path2D 点"
       >
-        paths
+        路径
       </button>
       <button
         role="tab"
         aria-selected={mode === 'comments'}
         onClick={() => setMode('comments')}
         className={`scene-mode-btn ${mode === 'comments' ? 'active' : ''}`}
-        title="Comment threads pinned to the canvas"
+        title="画布锚定评论讨论"
       >
-        comments
+        评论
       </button>
     </span>
   );

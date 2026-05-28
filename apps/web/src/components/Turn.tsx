@@ -50,7 +50,7 @@ export function Turn(props: TurnProps) {
         {built.blocks.length === 0 && props.status === 'streaming' && (
           <div className="agent-thinking">
             <span className="dot-pulse" />
-            <span>Thinking…</span>
+            <span>思考中…</span>
           </div>
         )}
 
@@ -183,7 +183,7 @@ function ToolGroup({
         <span className="name">{toolHeadName(family, items)}</span>
         <span className="arg">{summary}</span>
         <span className="dur">
-          {isRunning ? <span style={{ color: 'var(--accent)' }}>running…</span> : `${items.length} item${items.length === 1 ? '' : 's'}`}
+          {isRunning ? <span style={{ color: 'var(--accent)' }}>运行中…</span> : `${items.length} 项`}
         </span>
         <span className="twirl">{I.caretRight}</span>
       </div>
@@ -213,31 +213,31 @@ function ImageGenDetail({ item, projectPath }: { item: ToolItem; projectPath?: s
     <div>
       {prompt && (
         <>
-          <span className="label">Prompt</span>
+          <span className="label">提示词</span>
           <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{prompt}</pre>
         </>
       )}
       {size && (
         <>
-          <span className="label">Size</span>
+          <span className="label">尺寸</span>
           <pre>{size}</pre>
         </>
       )}
       {isRunning && (
         <div className="image-gen-pending">
-          <span className="dot-pulse" /> generating…
+          <span className="dot-pulse" /> 生成中…
         </div>
       )}
       {!isRunning && !hasAnyResult && item.output && (
         <>
-          <span className="label">Output</span>
+          <span className="label">输出</span>
           <pre>{item.output.length > 500 ? item.output.slice(0, 500) + '…' : item.output}</pre>
         </>
       )}
       {hasAnyResult && (
         <>
           <span className="label">
-            Result{(result.paths.length || 0) + (result.inlineBase64 ? 1 : 0) > 1 ? 's' : ''}
+            结果{(result.paths.length || 0) + (result.inlineBase64 ? 1 : 0) > 1 ? '（多项）' : ''}
           </span>
           <div className="image-gen-grid">
             {result.inlineBase64 && (
@@ -246,7 +246,7 @@ function ImageGenDetail({ item, projectPath }: { item: ToolItem; projectPath?: s
                   src={`data:image/png;base64,${result.inlineBase64}`}
                   alt="generated"
                 />
-                <figcaption title="Inline base64 from Codex CLI">inline</figcaption>
+                <figcaption title="来自 Codex CLI 的内联 base64">内联</figcaption>
               </figure>
             )}
             {result.paths.map((p, i) => (
@@ -295,7 +295,7 @@ function ImagePreview({ path, projectPath }: { path: string; projectPath?: strin
                   : 'image/png';
           setSrc(`data:${mime};base64,${r.base64}`);
         } else {
-          setError('Not an image');
+          setError('不是图片');
         }
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
@@ -308,7 +308,7 @@ function ImagePreview({ path, projectPath }: { path: string; projectPath?: strin
       ) : error ? (
         <div className="image-gen-err">⚠ {error}</div>
       ) : (
-        <div className="image-gen-loading">loading…</div>
+        <div className="image-gen-loading">加载中…</div>
       )}
       <figcaption title={path}>{shortPath(path)}</figcaption>
     </figure>
@@ -324,7 +324,7 @@ function ToolDetail({ item, projectPath }: { item: ToolItem; projectPath?: strin
     const changes = extractFileChanges(item);
     return (
       <div>
-        <span className="label">Files</span>
+        <span className="label">文件</span>
         {changes.length > 0 ? (
           <ul className="file-list">
             {changes.map((c, i) => (
@@ -335,7 +335,7 @@ function ToolDetail({ item, projectPath }: { item: ToolItem; projectPath?: strin
             ))}
           </ul>
         ) : (
-          <pre>(no changes recorded)</pre>
+          <pre>（未记录到变更）</pre>
         )}
       </div>
     );
@@ -345,12 +345,12 @@ function ToolDetail({ item, projectPath }: { item: ToolItem; projectPath?: strin
     const command = String((item.input as { command?: unknown })?.command ?? '');
     return (
       <div>
-        <span className="label">Command</span>
+        <span className="label">命令</span>
         <pre>{command}</pre>
         {item.output !== undefined && (
           <>
-            <span className="label">{item.isError ? 'Error' : 'Output'}</span>
-            <pre className={item.isError ? 'err' : ''}>{item.output || '(empty)'}</pre>
+            <span className="label">{item.isError ? '错误' : '输出'}</span>
+            <pre className={item.isError ? 'err' : ''}>{item.output || '（空）'}</pre>
           </>
         )}
       </div>
@@ -382,10 +382,10 @@ function TurnFooter(props: {
   usage?: { input?: number; output?: number; cachedRead?: number };
 }) {
   const labelMap: Record<TurnStatus, string> = {
-    streaming: 'Working…',
-    done: 'Done',
-    failed: 'Failed',
-    canceled: 'Stopped',
+    streaming: '执行中…',
+    done: '完成',
+    failed: '失败',
+    canceled: '已停止',
   };
   const dotClass = props.status === 'streaming' ? 'dot-pulse' : `dot-${props.status}`;
 
@@ -398,8 +398,8 @@ function TurnFooter(props: {
       {props.usage && (
         <>
           <span className="turn-sep">·</span>
-          <span title={`cached ${props.usage.cachedRead ?? 0}`}>
-            {(props.usage.input ?? 0).toLocaleString()} in / {(props.usage.output ?? 0).toLocaleString()} out
+          <span title={`缓存命中 ${props.usage.cachedRead ?? 0}`}>
+            输入 {(props.usage.input ?? 0).toLocaleString()} / 输出 {(props.usage.output ?? 0).toLocaleString()}
           </span>
         </>
       )}
@@ -426,18 +426,18 @@ function familyIconEl(f: ToolFamily) {
 }
 
 function toolHeadName(f: ToolFamily, items: ToolItem[]): string {
-  if (f === 'edit') return 'edit_file';
-  if (f === 'shell') return 'bash';
-  if (f === 'thinking') return 'thinking';
-  if (f === 'image') return 'image_gen';
+  if (f === 'edit') return '文件编辑';
+  if (f === 'shell') return '命令行';
+  if (f === 'thinking') return '思考';
+  if (f === 'image') return '图片生成';
   if (items.length > 0) return items[0].name.toLowerCase();
-  return 'tool';
+  return '工具';
 }
 
 function kindLabel(kind: string): string {
-  if (kind === 'add') return 'add';
-  if (kind === 'delete') return 'del';
-  return 'edit';
+  if (kind === 'add') return '新增';
+  if (kind === 'delete') return '删除';
+  return '修改';
 }
 
 function shortPath(p: string): string {
@@ -484,16 +484,16 @@ function FormSubmitPill({
         type="button"
         className="form-submit-head"
         onClick={() => setOpen((v) => !v)}
-        title="Toggle answers"
+        title="展开/收起答案"
       >
         <span className="form-submit-chev" aria-hidden>
           {open ? '▾' : '▸'}
         </span>
         <span className="form-submit-icon" aria-hidden>↩</span>
-        <span className="form-submit-label">submitted</span>
+        <span className="form-submit-label">已提交</span>
         <code className="form-submit-id">{formId}</code>
         <span className="form-submit-count">
-          {entries.length} field{entries.length === 1 ? '' : 's'}
+          {entries.length} 个字段
         </span>
       </button>
       {open && (

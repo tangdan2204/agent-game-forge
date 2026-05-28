@@ -130,18 +130,18 @@ export function QuestionFormCard(props: Props) {
           </span>
         )}
         <span className="qform-title">{props.form.title}</span>
-        {props.locked && <span className="qform-locked-tag">submitted</span>}
+        {props.locked && <span className="qform-locked-tag">已提交</span>}
         {autoActive && !props.locked && (
           <button
             type="button"
             className="qform-auto-hint"
-            title="Cancel the auto-submit timer — keep this form open until you submit it manually"
+            title="取消自动提交倒计时，保持表单开启直到你手动提交"
             onClick={(e) => {
               e.stopPropagation();
               setAutoActive(false);
             }}
           >
-            auto-submit in {formatCountdown(secondsLeft)} · cancel
+            {formatCountdown(secondsLeft)} 后自动提交 · 取消
           </button>
         )}
       </div>
@@ -168,7 +168,7 @@ export function QuestionFormCard(props: Props) {
               <div className="qform-actions">
                 {missing.length > 0 && (
                   <span className="qform-missing-hint">
-                    Need: {missing.join(', ')}
+                    还需填写：{missing.join('、')}
                   </span>
                 )}
                 <button
@@ -176,7 +176,7 @@ export function QuestionFormCard(props: Props) {
                   onClick={submit}
                   disabled={missing.length > 0}
                 >
-                  {props.form.submitLabel ?? 'Submit'}
+                  {props.form.submitLabel ?? '提交'}
                 </button>
               </div>
             );
@@ -324,7 +324,7 @@ function SpecViewer({ projectPath }: { projectPath: string }) {
       })
       .catch(() => {
         if (cancelled) return;
-        setError('spec.md not found yet — agent is still writing it');
+        setError('尚未找到 spec.md，智能体可能仍在写入。');
       });
     return () => {
       cancelled = true;
@@ -335,7 +335,7 @@ function SpecViewer({ projectPath }: { projectPath: string }) {
     return <div className="qform-spec-error">{error}</div>;
   }
   if (content === null) {
-    return <div className="qform-spec-loading">Loading spec…</div>;
+    return <div className="qform-spec-loading">正在加载 spec…</div>;
   }
 
   // Pull the title (first H1) and phase count for the collapsed summary.
@@ -350,7 +350,7 @@ function SpecViewer({ projectPath }: { projectPath: string }) {
         className="qform-spec-toggle"
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? '▾' : '▸'} {title} · {phaseCount} phase{phaseCount === 1 ? '' : 's'}
+        {open ? '▾' : '▸'} {title} · {phaseCount} 个阶段
       </button>
       {open && (
         <div className="qform-spec-body md-block">

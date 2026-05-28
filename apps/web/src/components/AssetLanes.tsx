@@ -129,24 +129,24 @@ export function AssetLanes(props: Props) {
   return (
     <div className="asset-lanes">
       {props.loading && (
-        <div className="lanes-loading">Discovering entities…</div>
+        <div className="lanes-loading">正在发现实体…</div>
       )}
 
       {props.errors.length > 0 && (
         <div className="lanes-errors">
           {props.errors.map((e) => (
             <div key={e.catalog} className="lanes-error" title={e.error}>
-              ⚠ {e.catalog} — failed to parse
+              ⚠ {e.catalog} — 解析失败
             </div>
           ))}
         </div>
       )}
 
       {/* Scenes */}
-      <Lane title="Scenes" count={props.scenes.length} scopeKey={props.scopeKey} laneId="scenes">
+      <Lane title="场景" count={props.scenes.length} scopeKey={props.scopeKey} laneId="scenes">
         {props.scenes.length === 0 && !props.loading && (
           <div className="lane-empty">
-            No scenes. They're read from <code>data/levels.json</code>.
+            暂无场景。场景从 <code>data/levels.json</code> 读取。
           </div>
         )}
         {props.scenes.map((s) => (
@@ -163,11 +163,10 @@ export function AssetLanes(props: Props) {
       </Lane>
 
       {/* Entities */}
-      <Lane title="Entities" count={entityCount} scopeKey={props.scopeKey} laneId="entities">
+      <Lane title="实体" count={entityCount} scopeKey={props.scopeKey} laneId="entities">
         {props.groups.length === 0 && !props.loading && (
           <div className="lane-empty">
-            No entity catalogs found. Add a <code>data/enemies.json</code> (or
-            similar) and they'll show up here.
+            未找到实体目录。添加 <code>data/enemies.json</code>（或同类文件）后会显示在这里。
           </div>
         )}
         {props.groups.map((g) => (
@@ -183,12 +182,12 @@ export function AssetLanes(props: Props) {
                   props.selectedEntityId === ent.id ? ' selected' : ''
                 }${ent.broken ? ' broken' : ''}`}
                 onClick={() => props.onSelectEntity(ent)}
-                title={ent.broken ? `${ent.id} — no sprites resolved` : ent.id}
+                title={ent.broken ? `${ent.id} — 未解析到精灵图` : ent.id}
               >
                 <span className="lane-row-icon">{KIND_ICON[ent.kind] ?? '◆'}</span>
                 <span className="lane-row-name">{ent.name}</span>
                 {ent.broken ? (
-                  <span className="lane-row-tag warn">broken</span>
+                  <span className="lane-row-tag warn">异常</span>
                 ) : (
                   <span className="lane-row-tag">{ent.sprites.length}</span>
                 )}
@@ -199,9 +198,9 @@ export function AssetLanes(props: Props) {
       </Lane>
 
       {/* Assets */}
-      <Lane title="Assets" count={assetFiles.length} scopeKey={props.scopeKey} laneId="assets" defaultOpen={false}>
+      <Lane title="资源" count={assetFiles.length} scopeKey={props.scopeKey} laneId="assets" defaultOpen={false}>
         {assetFiles.length === 0 && (
-          <div className="lane-empty">No loose image / audio assets.</div>
+          <div className="lane-empty">没有独立的图片/音频资源。</div>
         )}
         {assetFiles.map((f) => (
           <button
@@ -217,8 +216,8 @@ export function AssetLanes(props: Props) {
       </Lane>
 
       {/* Code */}
-      <Lane title="Code" count={codeFiles.length} scopeKey={props.scopeKey} laneId="code" defaultOpen={false}>
-        {codeFiles.length === 0 && <div className="lane-empty">No source files under src/.</div>}
+      <Lane title="代码" count={codeFiles.length} scopeKey={props.scopeKey} laneId="code" defaultOpen={false}>
+        {codeFiles.length === 0 && <div className="lane-empty">src/ 下没有源码文件。</div>}
         {codeFiles.map((f) => (
           <button
             key={f.relPath}

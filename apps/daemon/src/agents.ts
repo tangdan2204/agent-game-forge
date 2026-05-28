@@ -13,6 +13,30 @@ export interface AgentDef {
   fallbackModels: AgentModel[];
 }
 
+// Curated AIGW "best of" model set (2026-05). OGF passes model ids straight
+// to the selected CLI. These entries are usable when that CLI is configured
+// to route through an AIGW/OpenAI-compatible gateway.
+const AIGW_BEST_MODELS: AgentModel[] = [
+  { id: 'claude-opus-4-7', label: 'AIGW · claude-opus-4-7 · frontier reasoning' },
+  { id: 'claude-sonnet-4-6', label: 'AIGW · claude-sonnet-4-6 · everyday coding' },
+  { id: 'gpt-5.5-2026-04-24', label: 'AIGW · gpt-5.5-2026-04-24 · latest OpenAI flagship' },
+  { id: 'gpt-5.4-pro-2026-03-05', label: 'AIGW · gpt-5.4-pro-2026-03-05 · reliable generalist' },
+  { id: 'gemini-3.1-pro', label: 'AIGW · gemini-3.1-pro · multimodal + long context' },
+  { id: 'o3-pro-2025-06-10', label: 'AIGW · o3-pro-2025-06-10 · deep reasoning' },
+  { id: 'qwen3-coder-plus', label: 'AIGW · qwen3-coder-plus · code specialist' },
+];
+
+function withAigwBestModels(nativeModels: AgentModel[]): AgentModel[] {
+  const out: AgentModel[] = [];
+  const seen = new Set<string>();
+  for (const model of [...nativeModels, ...AIGW_BEST_MODELS]) {
+    if (seen.has(model.id)) continue;
+    seen.add(model.id);
+    out.push(model);
+  }
+  return out;
+}
+
 export const AGENT_DEFS: AgentDef[] = [
   {
     id: 'codex',
@@ -22,7 +46,7 @@ export const AGENT_DEFS: AgentDef[] = [
     // Mirrors what the Codex CLI's interactive picker shows. Update when
     // OpenAI publishes a newer set; OGF passes whatever id you pick straight
     // to `codex --model <id>` so any string Codex CLI accepts works here.
-    fallbackModels: [
+    fallbackModels: withAigwBestModels([
       { id: 'default', label: 'Default · CLI default' },
       { id: 'gpt-5.5', label: 'gpt-5.5 · frontier coding' },
       { id: 'gpt-5.4', label: 'gpt-5.4 · everyday' },
@@ -30,7 +54,7 @@ export const AGENT_DEFS: AgentDef[] = [
       { id: 'gpt-5.3-codex', label: 'gpt-5.3-codex · coding-tuned' },
       { id: 'gpt-5.3-codex-spark', label: 'gpt-5.3-codex-spark · ultra fast' },
       { id: 'gpt-5.2', label: 'gpt-5.2 · long-running agents' },
-    ],
+    ]),
   },
   {
     id: 'claude-code',
@@ -41,12 +65,12 @@ export const AGENT_DEFS: AgentDef[] = [
     // CLI pick — useful when Anthropic ships a new flagship and we haven't
     // updated this list yet. OGF passes the chosen id straight to
     // `claude --model <id>`.
-    fallbackModels: [
+    fallbackModels: withAigwBestModels([
       { id: 'default', label: 'Default · CLI default' },
       { id: 'claude-opus-4-7', label: 'Opus 4.7 · frontier' },
       { id: 'claude-sonnet-4-6', label: 'Sonnet 4.6 · everyday' },
       { id: 'claude-haiku-4-5', label: 'Haiku 4.5 · cheap & fast' },
-    ],
+    ]),
   },
 ];
 

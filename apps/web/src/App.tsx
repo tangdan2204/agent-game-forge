@@ -843,10 +843,10 @@ export function App() {
   const deleteConversationAt = useCallback(
     async (id: string) => {
       const ok = await askConfirm({
-        title: 'Delete this conversation?',
-        body: 'Messages and the Codex thread link will be removed from OGF. The Codex session file on disk is not touched.',
+        title: '删除这个会话？',
+        body: '会从 OGF 中移除此会话消息和 Codex 线程链接，不会改动磁盘上的 Codex 会话文件。',
         danger: true,
-        confirmLabel: 'Delete',
+        confirmLabel: '删除',
       });
       if (!ok) return;
       await removeConversation(id);
@@ -886,7 +886,7 @@ export function App() {
       } catch (err) {
         notify({
           kind: 'error',
-          title: 'Could not remove project',
+          title: '无法移除项目',
           body: err instanceof Error ? err.message : String(err),
         });
       }
@@ -909,7 +909,7 @@ export function App() {
       } catch (err) {
         notify({
           kind: 'error',
-          title: 'Could not open folder',
+          title: '无法打开文件夹',
           body: err instanceof Error ? err.message : String(err),
         });
       }
@@ -1154,7 +1154,7 @@ export function App() {
   const lastRunLabel = !lastRunAt
     ? '—'
     : running
-    ? 'in progress'
+    ? '进行中'
     : timeAgo(lastRunAt);
 
   return (
@@ -1219,7 +1219,7 @@ export function App() {
       <div
         className="sidebar-resize"
         onMouseDown={onSidebarDragStart}
-        title="Drag to resize sidebar"
+        title="拖动调整侧栏宽度"
       />
 
       <div
@@ -1298,7 +1298,7 @@ export function App() {
         )}
 
         {!agentCollapsed && (
-          <div className="split-bar" onMouseDown={onSplitDragStart} title="Drag to resize" />
+          <div className="split-bar" onMouseDown={onSplitDragStart} title="拖动调整宽度" />
         )}
 
         {!agentCollapsed && (
@@ -1343,11 +1343,11 @@ export function App() {
             type="button"
             className="agent-restore"
             onClick={() => setAgentCollapsed(false)}
-            title="Show Codex chat (⌘⇧A)"
-            aria-label="Show Codex chat"
+            title="显示聊天面板 (⌘⇧A)"
+            aria-label="显示聊天面板"
           >
             <span className="agent-restore-chev">{I.caret}</span>
-            <span className="agent-restore-lbl">Codex</span>
+            <span className="agent-restore-lbl">聊天</span>
           </button>
         )}
       </div>
@@ -1376,7 +1376,7 @@ export function App() {
             } catch (err) {
               notify({
                 kind: 'error',
-                title: 'Could not create project',
+                title: '无法创建项目',
                 body: err instanceof Error ? err.message : String(err),
               });
             }
@@ -1394,7 +1394,7 @@ export function App() {
               await refreshTree(project);
               setSelectedFile({ relPath, fileKind: 'text' });
             } catch (err) {
-              notify({ kind: 'error', title: 'Could not create file', body: err instanceof Error ? err.message : String(err) });
+              notify({ kind: 'error', title: '无法创建文件', body: err instanceof Error ? err.message : String(err) });
             }
           }}
         />
@@ -1407,15 +1407,15 @@ export function App() {
         <button
           className="pending-packs-chip"
           onClick={() => setShowPackReview(true)}
-          title="Review and apply staged animation packs"
+          title="查看并应用暂存动画包"
         >
           {I.refresh}
           <span>
             {pendingPacks.length === 1
-              ? `1 pack ready (${pendingPacks[0]!.fileCount} files)`
-              : `${pendingPacks.length} packs ready`}
+              ? `1 个包待处理（${pendingPacks[0]!.fileCount} 个文件）`
+              : `${pendingPacks.length} 个包待处理`}
           </span>
-          <span className="muted">→ Review</span>
+          <span className="muted">→ 复核</span>
         </button>
       )}
 
@@ -1470,10 +1470,10 @@ export function App() {
           }}
           onClearAll={async () => {
             const ok = await askConfirm({
-              title: `Revert all ${pending.length} pending slicing change${pending.length === 1 ? '' : 's'}?`,
-              body: 'This deletes the .ogf-slice.json sidecars. Your Godot project files are not touched.',
+              title: `还原全部 ${pending.length} 项待处理切片变更？`,
+              body: '这会删除 .ogf-slice.json 附带文件，不会改动你的 Godot 项目文件。',
               danger: true,
-              confirmLabel: 'Revert all',
+              confirmLabel: '全部还原',
             });
             if (!ok) return;
             try {
@@ -1481,9 +1481,9 @@ export function App() {
               bumpMetadataRev();
               await refreshPending(project);
               setShowPending(false);
-              notify({ kind: 'success', body: `Reverted ${r.removed} pending change${r.removed === 1 ? '' : 's'}` });
+              notify({ kind: 'success', body: `已还原 ${r.removed} 项待处理变更` });
             } catch (err) {
-              notify({ kind: 'error', title: 'Could not revert', body: err instanceof Error ? err.message : String(err) });
+              notify({ kind: 'error', title: '无法还原', body: err instanceof Error ? err.message : String(err) });
             }
           }}
           onDiscardOne={async (sidecarPath) => {
@@ -1491,9 +1491,9 @@ export function App() {
               await deleteFile(project.path, sidecarPath);
               bumpMetadataRev();
               await refreshPending(project);
-              notify({ kind: 'success', body: 'Discarded pending change' });
+              notify({ kind: 'success', body: '已丢弃待处理变更' });
             } catch (err) {
-              notify({ kind: 'error', title: 'Could not discard', body: err instanceof Error ? err.message : String(err) });
+              notify({ kind: 'error', title: '无法丢弃', body: err instanceof Error ? err.message : String(err) });
             }
           }}
         />
@@ -1545,7 +1545,7 @@ function EditorPane(props: {
           className="btn btn-sm btn-ghost btn-icon"
           onClick={props.onBack}
           disabled={!props.canBack}
-          title="Back"
+          title="后退"
         >
           ‹
         </button>
@@ -1553,7 +1553,7 @@ function EditorPane(props: {
           className="btn btn-sm btn-ghost btn-icon"
           onClick={props.onForward}
           disabled={!props.canForward}
-          title="Forward"
+          title="前进"
         >
           ›
         </button>
@@ -1565,7 +1565,7 @@ function EditorPane(props: {
             className={`topbar-tab-btn ${props.tab === 'assets' ? 'active' : ''}`}
             onClick={() => props.setTab('assets')}
           >
-            Assets
+            资源
           </button>
           <button
             type="button"
@@ -1574,7 +1574,7 @@ function EditorPane(props: {
             className={`topbar-tab-btn ${props.tab === 'scenes' ? 'active' : ''}`}
             onClick={() => props.setTab('scenes')}
           >
-            Scenes
+            场景
           </button>
           <button
             type="button"
@@ -1583,7 +1583,7 @@ function EditorPane(props: {
             className={`topbar-tab-btn ${props.tab === 'play' ? 'active' : ''}`}
             onClick={() => props.setTab('play')}
           >
-            Play
+            运行
           </button>
         </div>
         <span className="grow" />
@@ -1591,7 +1591,7 @@ function EditorPane(props: {
           type="button"
           className="btn btn-sm btn-ghost btn-icon"
           onClick={props.onOpenSettings}
-          title="Settings"
+          title="设置"
         >
           {I.gear}
         </button>
@@ -1709,14 +1709,15 @@ function ProjectWelcome({
   async function startRefactor() {
     if (!onAskCodex || !onSwitchToProject) return;
     const ok = await askConfirm({
-      title: 'Refactor to OGF structure?',
+      title: '重构为 OGF 结构？',
       body:
-        `OGF will COPY this project to:\n\n  ${suggestedDest}\n\n` +
-        `Then switch to the copy + drop a refactor prompt in the chat.\n` +
-        `The agent will write data/*.json catalogs + .ogf/spec.md ` +
-        `describing what's there. Sidecar mode — source code stays.\n\n` +
-        `Original at "${project.path}" stays untouched.`,
-      confirmLabel: 'Copy + Refactor',
+        `OGF 会先把该项目复制到：\n\n  ${suggestedDest}\n\n` +
+        `然后切换到副本，并在聊天里自动放入重构提示词。\n` +
+        `智能体会生成 data/*.json 目录文件和 .ogf/spec.md，` +
+        `用于描述现有项目结构。Sidecar 模式下，副本内源码也不会被改动。\n\n` +
+        `在你点击“复制并重构”之前，不会执行任何操作。\n\n` +
+        `原项目路径 "${project.path}" 保持不变。`,
+      confirmLabel: '复制并重构',
     });
     if (!ok) return;
     setRefactoring(true);
@@ -1728,7 +1729,7 @@ function ProjectWelcome({
     } catch (err) {
       notify({
         kind: 'error',
-        title: 'Refactor copy failed',
+        title: '重构复制失败',
         body: err instanceof Error ? err.message : String(err),
       });
     } finally {
@@ -1751,32 +1752,30 @@ function ProjectWelcome({
             {project.path}
           </div>
           <p style={{ marginTop: 16, color: 'var(--ink-2)', fontSize: 12 }}>
-            Pick a file on the left, or ask Codex to make one.
+            从左侧选择文件，或让 Codex 帮你创建。
           </p>
 
           {onAskCodex && onSwitchToProject && (
             <div className="welcome-import-card">
               <div className="welcome-import-title">
-                {I.refresh} Have an existing JS game?
+                {I.refresh} 已有 JS 游戏项目？
               </div>
               <p className="welcome-import-body">
-                One-click conversion to OGF structure. OGF first copies this
-                project to <code>{suggestedDest.split(/[\\/]/).pop()}</code> next to
-                the original (your repo stays untouched), switches to the copy,
-                then drops a refactor prompt in the chat. The agent generates{' '}
-                <code>data/*.json</code> catalogs + <code>.ogf/spec.md</code>{' '}
-                describing what's already there. <strong>Sidecar mode</strong> —
-                source code in the copy is also left alone.
+                一键转换为 OGF 结构。OGF 会先把当前项目复制到原目录旁的{' '}
+                <code>{suggestedDest.split(/[\\/]/).pop()}</code>（原仓库不改动），
+                切换到副本后自动在聊天里放入重构提示词。智能体会生成{' '}
+                <code>data/*.json</code> 目录文件和 <code>.ogf/spec.md</code>{' '}
+                来描述现有内容。<strong>Sidecar 模式</strong>下，副本源码也保持不变。
               </p>
               <button
                 className="btn btn-sm btn-primary"
                 onClick={() => void startRefactor()}
                 disabled={refactoring}
               >
-                {refactoring ? 'Copying…' : 'Refactor to OGF structure'}
+                {refactoring ? '复制中…' : '重构为 OGF 结构'}
               </button>
               <div className="muted" style={{ fontSize: 10.5, marginTop: 8 }}>
-                Confirm dialog explains the copy step before anything happens.
+                在执行前会先弹出确认框，明确说明复制步骤。
               </div>
             </div>
           )}
@@ -1888,15 +1887,15 @@ function ScenePicker({
     <div className="inspector">
       <div className="crumbs">
         <span className="last">{project.name}</span>
-        <span className="badge-dim">scenes</span>
+        <span className="badge-dim">场景</span>
         <span className="actions">
           {unusedCount > 0 && (
             <button
               className="btn btn-sm btn-ghost"
               onClick={() => setUsedOnly((v) => !v)}
-              title={usedOnly ? 'Show all scenes' : 'Hide unused scenes'}
+              title={usedOnly ? '显示全部场景' : '隐藏未使用场景'}
             >
-              {usedOnly ? '👁' : '◐'} {usedOnly ? 'showing used' : `${unusedCount} unused`}
+              {usedOnly ? '👁' : '◐'} {usedOnly ? '仅显示已使用' : `${unusedCount} 个未使用`}
             </button>
           )}
         </span>
@@ -1904,18 +1903,18 @@ function ScenePicker({
       <div style={{ overflow: 'auto', padding: 24 }}>
         {items.length === 0 ? (
           <div className="muted mono" style={{ fontSize: 12 }}>
-            No .tscn files found in this project.
+            当前项目未找到 .tscn 文件。
           </div>
         ) : visible.length === 0 ? (
           <div className="muted mono" style={{ fontSize: 12 }}>
-            No used scenes — toggle the filter to see all {items.length}.
+            没有已使用场景，可切换筛选查看全部 {items.length} 个。
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 6, maxWidth: 600 }}>
             <div className="muted mono" style={{ fontSize: 11, marginBottom: 4 }}>
               {usedOnly
-                ? `Showing ${visible.length} used scene${visible.length === 1 ? '' : 's'} (${unusedCount} hidden)`
-                : `${items.length} scene${items.length === 1 ? '' : 's'} — ${unusedCount} unused`}
+                ? `显示 ${visible.length} 个已使用场景（隐藏 ${unusedCount} 个）`
+                : `${items.length} 个场景 — ${unusedCount} 个未使用`}
             </div>
             {visible.map(({ node: s, isMain, isUsed }) => (
               <button
@@ -1925,8 +1924,8 @@ function ScenePicker({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span className="mono" style={{ fontSize: 12 }}>{s.name}</span>
-                  {isMain && <span className="badge-dim" style={{ color: 'var(--accent)' }}>main</span>}
-                  {!isUsed && <span className="badge-dim" style={{ color: 'var(--ink-3)' }}>unused</span>}
+                  {isMain && <span className="badge-dim" style={{ color: 'var(--accent)' }}>主场景</span>}
+                  {!isUsed && <span className="badge-dim" style={{ color: 'var(--ink-3)' }}>未使用</span>}
                 </div>
                 <span className="muted mono" style={{ fontSize: 11 }}>{s.relPath}</span>
               </button>
@@ -2018,7 +2017,7 @@ function PlaceholderView({ title, hint }: { title: string; hint: string }) {
     <div className="inspector">
       <div className="crumbs">
         <span className="last">{title}</span>
-        <span className="badge-dim">placeholder</span>
+        <span className="badge-dim">占位</span>
       </div>
       <div className="canvas-area">
         <div className="muted mono" style={{ fontSize: 12 }}>{hint}</div>
@@ -2044,10 +2043,10 @@ function EmptyEditor({ onOpen }: { onOpen: () => void }) {
           <span className="brand-game">Game</span>
           <span className="brand-forge">Forge</span>
         </span>
-        <h2>Open a project to begin</h2>
-        <p>Pick a Godot, Unity, or web game folder. Codex will run with that folder as its workspace.</p>
+        <h2>打开项目开始使用</h2>
+        <p>选择 Godot、Unity 或 Web 游戏目录。Codex 会在该目录工作。</p>
         <button className="btn btn-primary" onClick={onOpen}>
-          {I.folder} Open project folder
+          {I.folder} 打开项目目录
         </button>
       </div>
     </div>
@@ -2091,7 +2090,7 @@ function AgentPane(props: {
   onCollapse: () => void;
 }) {
   const currentTitle =
-    props.conversations.find((c) => c.id === props.conversationId)?.title || 'New conversation';
+    props.conversations.find((c) => c.id === props.conversationId)?.title || '新会话';
   const isResuming = !!props.conversations.find((c) => c.id === props.conversationId)?.codexThreadId;
   const dropzoneRef = useRef<DropzoneHandle>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -2145,9 +2144,9 @@ function AgentPane(props: {
         <div className="agent-drag-overlay">
           <div className="agent-drag-card">
             <div className="agent-drag-icon">📎</div>
-            <div>Drop to attach</div>
+            <div>松开即可附加</div>
             <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>
-              Any file — images, audio, configs, code, etc.
+              支持任意文件：图片、音频、配置、代码等。
             </div>
           </div>
         </div>
@@ -2168,9 +2167,9 @@ function AgentPane(props: {
               fontSize: 11,
             }}
             onClick={props.onOpenPending}
-            title="View pending slicing changes"
+            title="查看待处理切片变更"
           >
-            {I.scissors} {props.pendingCount} pending
+            {I.scissors} {props.pendingCount} 项待处理
           </button>
         )}
         <HistoryDropdown
@@ -2188,18 +2187,18 @@ function AgentPane(props: {
         <span className="runctl">
           {props.running ? (
             <button className="btn btn-sm" style={{ color: 'var(--red)' }} onClick={props.onStop}>
-              {I.stop} Stop
+              {I.stop} 停止
             </button>
           ) : (
             <>
-              <button className="btn btn-sm btn-ghost" onClick={props.onNewConversation} disabled={!props.project} title="New conversation">{I.plus}</button>
+              <button className="btn btn-sm btn-ghost" onClick={props.onNewConversation} disabled={!props.project} title="新建会话">{I.plus}</button>
             </>
           )}
           <button
             className="icon-btn agent-collapse-btn"
             onClick={props.onCollapse}
-            title="Hide chat panel"
-            aria-label="Hide Codex chat panel"
+            title="隐藏聊天面板"
+            aria-label="隐藏聊天面板"
           >
             ›
           </button>
@@ -2208,7 +2207,7 @@ function AgentPane(props: {
 
       <div className="convo" ref={props.convoRef}>
         {props.turns.length === 0 && (
-          <div className="msg-sys">{I.spark} {props.project ? 'Ready. Ask Codex something.' : 'Open a project to start.'}</div>
+          <div className="msg-sys">{I.spark} {props.project ? '已就绪，向 Codex 发送需求。' : '先打开一个项目再开始。'}</div>
         )}
         {props.turns.map((t) => (
           <Turn
@@ -2248,18 +2247,18 @@ function AgentPane(props: {
             disabled={!props.agent?.available || props.running || !props.project}
             placeholder={
               !props.project
-                ? 'Open a project first'
+                ? '请先打开一个项目'
                 : props.agent?.available
-                  ? `Ask ${props.agent.id === 'claude-code' ? 'Claude' : 'Codex'} to generate, edit, or fix something… (⌘L to focus)`
-                  : `${props.agent?.id === 'claude-code' ? 'Claude Code' : 'Codex'} not detected`
+                  ? `让 ${props.agent.id === 'claude-code' ? 'Claude' : 'Codex'} 生成、修改或修复内容…（⌘L 聚焦）`
+                  : `${props.agent?.id === 'claude-code' ? 'Claude Code' : 'Codex'} 未检测到`
             }
           />
           <div className="composer-actions">
             <MenuPicker
-              label="model"
+              label="模型"
               value={props.model}
               onChange={props.setModel}
-              options={(props.agent?.models ?? [{ id: 'default', label: 'Default' }]).map(
+              options={(props.agent?.models ?? [{ id: 'default', label: '默认' }]).map(
                 (m) => ({
                   // The agent feeds labels like 'gpt-5.5 · frontier coding'.
                   // The trigger only shows the model id (everything before
@@ -2275,15 +2274,15 @@ function AgentPane(props: {
                Claude Code doesn't expose an equivalent knob, so hide it. */}
             {props.agent?.id !== 'claude-code' && (
               <MenuPicker
-                label="reasoning"
+                label="推理"
                 value={props.reasoning}
                 onChange={(v) => props.setReasoning(v as ReasoningEffort)}
                 options={[
-                  { id: 'minimal', triggerLabel: 'minimal', primary: 'minimal', hint: 'fastest, no plan' },
-                  { id: 'low',     triggerLabel: 'low',     primary: 'low',     hint: 'short reasoning' },
-                  { id: 'medium',  triggerLabel: 'medium',  primary: 'medium',  hint: 'balanced' },
-                  { id: 'high',    triggerLabel: 'high',    primary: 'high',    hint: 'deep reasoning' },
-                  { id: 'xhigh',   triggerLabel: 'xhigh',   primary: 'xhigh',   hint: 'maximum' },
+                  { id: 'minimal', triggerLabel: '极低', primary: '极低', hint: '最快，无规划' },
+                  { id: 'low',     triggerLabel: '低',   primary: '低',   hint: '短推理' },
+                  { id: 'medium',  triggerLabel: '中',   primary: '中',   hint: '平衡' },
+                  { id: 'high',    triggerLabel: '高',   primary: '高',   hint: '深度推理' },
+                  { id: 'xhigh',   triggerLabel: '最高', primary: '最高', hint: '最高强度' },
                 ]}
               />
             )}
@@ -2291,7 +2290,7 @@ function AgentPane(props: {
               className="icon-btn composer-attach"
               onClick={() => dropzoneRef.current?.openFilePicker()}
               disabled={!props.project}
-              title="Attach files (drag-and-drop also works)"
+              title="附加文件（支持拖放）"
             >
               📎
             </button>
@@ -2301,19 +2300,19 @@ function AgentPane(props: {
               data-stop={props.running}
               onClick={props.running ? props.onStop : props.onSend}
               disabled={!props.running && (!props.agent?.available || !props.prompt.trim() || !props.project)}
-              title={props.running ? 'Stop' : 'Send'}
+              title={props.running ? '停止' : '发送'}
             >
               {props.running ? I.stop : I.send}
             </button>
           </div>
         </div>
         <div className="composer-foot">
-          <span><span className="kbd">⏎</span> send</span>
-          <span><span className="kbd">⇧⏎</span> newline</span>
+          <span><span className="kbd">⏎</span> 发送</span>
+          <span><span className="kbd">⇧⏎</span> 换行</span>
           <span style={{ flex: 1 }} />
-          <span>{isResuming ? 'resume' : 'new thread'}</span>
+          <span>{isResuming ? '续接' : '新线程'}</span>
           <span style={{ opacity: 0.5 }}>·</span>
-          <span>{props.refs.length} ref{props.refs.length === 1 ? '' : 's'}</span>
+          <span>{props.refs.length} 个参考</span>
         </div>
       </div>
     </aside>
@@ -2426,9 +2425,9 @@ function HistoryDropdown(props: {
         className="btn btn-sm btn-ghost"
         onClick={() => props.setOpen(!props.open)}
         disabled={props.disabled}
-        title="History"
+        title="历史"
       >
-        {I.branch} history
+        {I.branch} 历史
       </button>
       {props.open && panelPos &&
         createPortal(
@@ -2444,7 +2443,7 @@ function HistoryDropdown(props: {
             }}
           >
           {props.conversations.length === 0 && (
-            <div className="proj-dropdown-empty">No conversations</div>
+            <div className="proj-dropdown-empty">暂无会话</div>
           )}
           {props.conversations.map((c) => (
             <div
@@ -2456,7 +2455,7 @@ function HistoryDropdown(props: {
               }}
             >
               <div className="proj-dropdown-name">
-                {c.title || 'Untitled'}
+                {c.title || '未命名'}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -2470,7 +2469,7 @@ function HistoryDropdown(props: {
                     fontSize: 14,
                     padding: '0 4px',
                   }}
-                  title="Delete"
+                  title="删除"
                 >
                   ×
                 </button>
@@ -2493,11 +2492,11 @@ function HistoryDropdown(props: {
                     color: c.agentId === 'claude-code' ? '#c084fc' : '#6ee78e',
                     textTransform: 'uppercase',
                   }}
-                  title={`Created with ${c.agentId === 'claude-code' ? 'Claude Code' : 'Codex'}`}
+                  title={`由 ${c.agentId === 'claude-code' ? 'Claude Code' : 'Codex'} 创建`}
                 >
                   {c.agentId === 'claude-code' ? 'claude' : 'codex'}
                 </span>
-                {c.codexThreadId ? 'thread saved' : 'no thread yet'} · {timeAgo(c.updatedAt)}
+                {c.codexThreadId ? '线程已保存' : '暂无线程'} · {timeAgo(c.updatedAt)}
               </div>
             </div>
           ))}
@@ -2509,7 +2508,7 @@ function HistoryDropdown(props: {
               props.setOpen(false);
             }}
           >
-            + New conversation
+            + 新建会话
           </div>
           <div
             className="proj-dropdown-item action"
@@ -2519,7 +2518,7 @@ function HistoryDropdown(props: {
               props.setOpen(false);
             }}
           >
-            {I.branch} Import Codex session…
+            {I.branch} 导入 Codex 会话…
           </div>
         </div>,
         document.body,
@@ -2536,11 +2535,11 @@ function NewFileModal(props: { onCancel: () => void; onSubmit: (relPath: string)
     <div className="modal-scrim" onClick={props.onCancel}>
       <div className="modal" style={{ height: 'auto', width: 'min(520px, 100%)' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <span className="title">New file</span>
+          <span className="title">新建文件</span>
           <button className="close" onClick={props.onCancel}>{I.close}</button>
         </div>
         <div style={{ padding: 20, display: 'grid', gap: 10 }}>
-          <p style={{ margin: 0, color: 'var(--ink-2)', fontSize: 12 }}>Relative path. Subdirectories created as needed.</p>
+          <p style={{ margin: 0, color: 'var(--ink-2)', fontSize: 12 }}>填写相对路径。子目录会自动创建。</p>
           <input
             autoFocus
             placeholder="scenes/level_2.tscn"
@@ -2561,8 +2560,8 @@ function NewFileModal(props: { onCancel: () => void; onSubmit: (relPath: string)
         </div>
         <div className="modal-foot">
           <span className="grow" />
-          <button className="btn btn-sm" onClick={props.onCancel}>Cancel</button>
-          <button className="btn btn-sm btn-primary" onClick={() => props.onSubmit(text.trim())} disabled={!text.trim()}>Create</button>
+          <button className="btn btn-sm" onClick={props.onCancel}>取消</button>
+          <button className="btn btn-sm btn-primary" onClick={() => props.onSubmit(text.trim())} disabled={!text.trim()}>创建</button>
         </div>
       </div>
     </div>
@@ -2585,7 +2584,7 @@ function messagesToTurns(messages: Message[], hasActiveRun = false): UiTurn[] {
           status: 'failed',
           startedAt: pendingUser.createdAt,
           endedAt: pendingUser.createdAt,
-          error: 'No agent response recorded.',
+          error: '未记录到智能体回复。',
         });
       }
       pendingUser = { text: m.content, createdAt: m.createdAt };
@@ -2615,7 +2614,7 @@ function messagesToTurns(messages: Message[], hasActiveRun = false): UiTurn[] {
       status: hasActiveRun ? 'streaming' : 'failed',
       startedAt: pendingUser.createdAt,
       endedAt: hasActiveRun ? undefined : Date.now(),
-      error: hasActiveRun ? undefined : 'No agent response recorded.',
+      error: hasActiveRun ? undefined : '未记录到智能体回复。',
     });
   }
   return turns;
@@ -2645,14 +2644,14 @@ function isImageExt(ext: string): boolean {
 function timeAgo(ts: number): string {
   const ms = Date.now() - ts;
   const s = Math.floor(ms / 1000);
-  if (s < 5) return 'just now';
-  if (s < 60) return `${s}s ago`;
+  if (s < 5) return '刚刚';
+  if (s < 60) return `${s} 秒前`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return `${m} 分钟前`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return `${h} 小时前`;
   const d = Math.floor(h / 24);
-  return `${d}d ago`;
+  return `${d} 天前`;
 }
 
 /** Pull the descriptive tail off labels like 'gpt-5.5 · frontier coding'.

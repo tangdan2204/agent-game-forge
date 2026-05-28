@@ -136,7 +136,7 @@ function detectTable(content: string): DetectResult {
   } catch (err) {
     return {
       arrays: [],
-      reason: `JSON parse error: ${err instanceof Error ? err.message : String(err)}`,
+      reason: `JSON 解析错误：${err instanceof Error ? err.message : String(err)}`,
     };
   }
 
@@ -154,7 +154,7 @@ function detectTable(content: string): DetectResult {
     }
     if (arrays.length > 0) return { arrays };
   }
-  return { arrays: [], reason: 'No array-of-objects found.' };
+  return { arrays: [], reason: '未找到“对象数组”结构。' };
 }
 
 function getAtPath<T>(root: unknown, path: string[]): T {
@@ -219,7 +219,7 @@ export function TableEditor(props: Props) {
   if (detect.arrays.length === 0) {
     return (
       <div className="table-editor-empty">
-        Not a table-shaped JSON. {detect.reason}
+        该 JSON 不是表格结构。{detect.reason}
       </div>
     );
   }
@@ -280,7 +280,7 @@ export function TableEditor(props: Props) {
                 setActiveIdx(i);
                 setSelectedRow(null);
               }}
-              title={`Edit ${a.label} (${a.length} entries)`}
+              title={`编辑 ${a.label}（${a.length} 条）`}
             >
               <span className="mono">{a.label}</span>
               <span className="muted"> · {a.length}</span>
@@ -290,9 +290,9 @@ export function TableEditor(props: Props) {
       )}
       <div className="table-editor-toolbar">
         <span className="mono">
-          {arrayPath.length > 0 ? `.${arrayPath.join('.')}` : '(root array)'}
+          {arrayPath.length > 0 ? `.${arrayPath.join('.')}` : '（根数组）'}
         </span>
-        <span className="muted">{rows.length} rows · {columns.length} columns</span>
+        <span className="muted">{rows.length} 行 · {columns.length} 列</span>
         <span style={{ flex: 1 }} />
         {timeKey && (
           <div className="view-toggle">
@@ -300,18 +300,18 @@ export function TableEditor(props: Props) {
               className={`view-toggle-btn ${view === 'table' ? 'active' : ''}`}
               onClick={() => setView('table')}
             >
-              table
+              表格
             </button>
             <button
               className={`view-toggle-btn ${view === 'timeline' ? 'active' : ''}`}
               onClick={() => setView('timeline')}
-              title={`Timeline by '${timeKey}'`}
+              title={`按 '${timeKey}' 显示时间线`}
             >
-              timeline
+              时间线
             </button>
           </div>
         )}
-        <button className="btn btn-sm btn-primary" onClick={addRow}>+ row</button>
+        <button className="btn btn-sm btn-primary" onClick={addRow}>+ 行</button>
       </div>
 
       {view === 'table' && (
@@ -398,7 +398,7 @@ function TableView({
               <td className="row-actions">
                 <button
                   className="row-btn"
-                  title="Move up"
+                  title="上移"
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveRow(i, -1);
@@ -409,7 +409,7 @@ function TableView({
                 </button>
                 <button
                   className="row-btn"
-                  title="Move down"
+                  title="下移"
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveRow(i, 1);
@@ -420,7 +420,7 @@ function TableView({
                 </button>
                 <button
                   className="row-btn danger"
-                  title="Delete row"
+                  title="删除行"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteRow(i);
@@ -565,7 +565,7 @@ function ImageCell({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onClick={(e) => e.stopPropagation()}
-        placeholder="res://path/to/image.png"
+        placeholder="res://路径/图片.png"
       />
     </span>
   );
@@ -673,7 +673,7 @@ function TimelineView({
       </div>
       {selectedRow !== null && rows[selectedRow] && (
         <div className="timeline-detail">
-          <div className="timeline-detail-title">Entry #{selectedRow}</div>
+          <div className="timeline-detail-title">条目 #{selectedRow}</div>
           {columns.map((c) => (
             <div className="timeline-detail-row" key={c.key}>
               <span className="muted">{c.key}</span>

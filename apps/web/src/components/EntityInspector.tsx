@@ -18,17 +18,17 @@ interface Props {
 }
 
 const KIND_LABEL: Record<string, string> = {
-  player: 'player',
-  enemy: 'enemy',
-  hero: 'hero',
-  boss: 'boss',
-  tower: 'tower',
-  pickup: 'pickup',
-  npc: 'npc',
-  projectile: 'projectile',
-  item: 'item',
-  hazard: 'hazard',
-  unknown: 'entity',
+  player: '玩家',
+  enemy: '敌人',
+  hero: '英雄',
+  boss: '首领',
+  tower: '塔',
+  pickup: '拾取物',
+  npc: 'NPC',
+  projectile: '投射物',
+  item: '物品',
+  hazard: '危险物',
+  unknown: '实体',
 };
 
 interface PipelineMeta {
@@ -298,22 +298,21 @@ export function EntityInspector(props: Props) {
 
   function regeneratePrompt(): string {
     const lines = [
-      `Regenerate the COMPLETE sprite pack for entity \`${entity.id}\` (catalog: ${entity.catalog}).`,
+      `请重生成实体 \`${entity.id}\` 的完整精灵包（目录文件：${entity.catalog}）。`,
       '',
-      'The pack:',
-      ...entity.sprites.map((s) => `- ${s.relPath}  (action: ${s.action})`),
+      '当前精灵包：',
+      ...entity.sprites.map((s) => `- ${s.relPath}（动作：${s.action}）`),
       '',
-      'Goal: refresh every animation as a coherent set so the entity reads as',
-      'the SAME character across all of them. Use the generate2dsprite skill.',
+      '目标：将所有动画作为同一套角色一致更新，确保每个动作看起来都是同一个角色。',
+      '请使用 generate2dsprite 技能。',
       '',
-      'For each animation:',
-      '1. Stage the full pack to .ogf/regen/<that animation dir>/ via --output-dir.',
-      '2. view_image .ogf/style-anchor.png (if present) + one existing animation',
-      '   of this entity as the identity reference before generating.',
-      '3. Keep each animation\'s existing grid + fps unless a change is clearly better.',
+      '对每个动画都执行：',
+      '1. 使用 --output-dir 将完整产物写入 .ogf/regen/<该动画目录>/ 暂存区。',
+      '2. 生成前先 view_image .ogf/style-anchor.png（若存在），并查看该实体一个现有动作作为身份参考。',
+      '3. 除非有充分理由，否则保持每个动画原有的网格和 fps。',
       '',
-      'Do not touch any other file. Report the layout used for each animation when done.',
-      'The user reviews + applies the swap via the pack review UI.',
+      '不要改动其他文件。完成后汇报每个动画采用的布局参数。',
+      '用户会在动画包审查 UI 中确认并应用替换。',
     ];
     return lines.join('\n');
   }
@@ -327,8 +326,8 @@ export function EntityInspector(props: Props) {
             {KIND_LABEL[entity.kind] ?? entity.kind}
           </span>
           {entity.broken && (
-            <span className="ent-broken-badge" title="No sprites resolved for this entity">
-              no sprites
+            <span className="ent-broken-badge" title="该实体未解析到精灵图">
+              无精灵图
             </span>
           )}
         </div>
@@ -344,13 +343,12 @@ export function EntityInspector(props: Props) {
       {/* Animations */}
       <section className="ent-section">
         <div className="ent-section-head">
-          <span>Animations</span>
+          <span>动画</span>
           <span className="ent-count">{entity.sprites.length}</span>
         </div>
         {entity.sprites.length === 0 ? (
           <div className="ent-empty">
-            No sprites found. The catalog row exists but no animation paths or{' '}
-            <code>assets/sprites/{entity.id}/</code> folder resolved.
+            未找到精灵图。目录行存在，但未解析到动画路径或 <code>assets/sprites/{entity.id}/</code> 文件夹。
           </div>
         ) : (
           <div className="ent-anim-strip">
@@ -359,12 +357,12 @@ export function EntityInspector(props: Props) {
                 key={s.relPath}
                 className="ent-anim-cell"
                 onClick={() => props.onOpenFile(s.relPath)}
-                title={`${s.relPath}\nClick to open`}
+                title={`${s.relPath}\n点击打开`}
               >
                 <SpriteThumb projectPath={projectPath} sprite={s} />
                 <span className="ent-anim-label">
                   {s.action}
-                  {s.isPack && <span className="ent-pack-dot" title="Animation pack" />}
+                  {s.isPack && <span className="ent-pack-dot" title="动画包" />}
                 </span>
               </button>
             ))}
@@ -376,8 +374,8 @@ export function EntityInspector(props: Props) {
       {statRows.length > 0 && (
         <section className="ent-section">
           <div className="ent-section-head">
-            <span>Stats</span>
-            {!hasStatsObject && <span className="ent-hint">inferred from top-level fields</span>}
+            <span>属性</span>
+            {!hasStatsObject && <span className="ent-hint">由顶层字段推断</span>}
           </div>
           <div className="ent-stats">
             {statRows.map((row) => {
@@ -419,12 +417,12 @@ export function EntityInspector(props: Props) {
       {(displayW !== null || anchor !== null || hitbox) && (
         <section className="ent-section">
           <div className="ent-section-head">
-            <span>Display</span>
+            <span>显示</span>
           </div>
           <div className="ent-kv">
             {displayW !== null && displayH !== null && (
               <div className="ent-kv-row">
-                <span className="ent-kv-k">Render</span>
+                <span className="ent-kv-k">渲染尺寸</span>
                 <span className="ent-kv-v">
                   {displayW} × {displayH} px
                 </span>
@@ -432,13 +430,13 @@ export function EntityInspector(props: Props) {
             )}
             {anchor && (
               <div className="ent-kv-row">
-                <span className="ent-kv-k">Anchor</span>
+                <span className="ent-kv-k">锚点</span>
                 <span className="ent-kv-v">{anchor}</span>
               </div>
             )}
             {hitbox && (
               <div className="ent-kv-row">
-                <span className="ent-kv-k">Hitbox</span>
+                <span className="ent-kv-k">碰撞盒</span>
                 <span className="ent-kv-v">
                   {typeof hitbox.w === 'number' ? hitbox.w : '?'} ×{' '}
                   {typeof hitbox.h === 'number' ? hitbox.h : '?'}
@@ -452,14 +450,14 @@ export function EntityInspector(props: Props) {
       {/* Used in */}
       <section className="ent-section">
         <div className="ent-section-head">
-          <span>Used in</span>
+          <span>使用位置</span>
         </div>
         <div className="ent-kv">
           <div className="ent-kv-row">
-            <span className="ent-kv-k">Scenes</span>
+            <span className="ent-kv-k">场景</span>
             <span className="ent-kv-v">
               {usedScenes.length === 0 ? (
-                <span className="ent-muted">none detected</span>
+                <span className="ent-muted">未检测到</span>
               ) : (
                 usedScenes.map((s, i) => (
                   <span key={s.file}>
@@ -473,12 +471,12 @@ export function EntityInspector(props: Props) {
             </span>
           </div>
           <div className="ent-kv-row">
-            <span className="ent-kv-k">Code</span>
+            <span className="ent-kv-k">代码</span>
             <span className="ent-kv-v">
               {usagesLoading ? (
-                <span className="ent-muted">scanning…</span>
+                <span className="ent-muted">扫描中…</span>
               ) : usages.length === 0 ? (
-                <span className="ent-muted">no references</span>
+                <span className="ent-muted">无引用</span>
               ) : (
                 usages.slice(0, 6).map((h, i) => (
                   <span key={`${h.file}:${h.line}`}>
@@ -497,19 +495,19 @@ export function EntityInspector(props: Props) {
       {/* Actions */}
       <section className="ent-section">
         <div className="ent-section-head">
-          <span>Actions</span>
+          <span>操作</span>
         </div>
         <div className="ent-actions">
           <button
             className="btn btn-sm"
             disabled={entity.sprites.length === 0}
             onClick={() => props.onAskAgent(regeneratePrompt())}
-            title="Ask the agent to regenerate every animation as a coherent set"
+            title="让智能体将全部动画按统一风格重生成"
           >
-            {I.refresh} Regenerate whole pack
+            {I.refresh} 重生成整包
           </button>
           <button className="btn btn-sm btn-ghost" onClick={() => props.onOpenFile(entity.catalog)}>
-            Open catalog
+            打开目录文件
           </button>
         </div>
       </section>

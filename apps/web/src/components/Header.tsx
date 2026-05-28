@@ -28,7 +28,7 @@ export function Header(props: Props) {
     : props.agentLoading
     ? 'off'
     : 'error';
-  const stateLabel = agentState === 'ok' ? 'Codex' : agentState === 'error' ? 'Codex offline' : 'detecting…';
+  const localizedStateLabel = agentState === 'ok' ? 'Codex' : agentState === 'error' ? 'Codex 离线' : '检测中…';
 
   return (
     <header className="hdr">
@@ -60,28 +60,28 @@ export function Header(props: Props) {
 
       <div className="cmdk" role="button">
         {I.search}
-        <span>Search files, scenes, ask Codex…</span>
+        <span>搜索文件、场景，或向 Codex 提问…</span>
         <span className="kbd">⌘K</span>
       </div>
 
       <div className="hdr-right">
-        <button className="agent-pill" data-state={agentState} title={props.agent?.path ?? 'Codex agent status'}>
+        <button className="agent-pill" data-state={agentState} title={props.agent?.path ?? 'Codex 代理状态'}>
           <span className="dot" />
-          {stateLabel}
+          {localizedStateLabel}
           {props.agent?.version && <span className="ver">{props.agent.version.replace(/^codex-cli\s*/, 'v')}</span>}
         </button>
-        <button className="btn btn-primary" onClick={props.onPlay} disabled={!props.project} title={props.project ? 'Play / build preview' : 'No project open'}>
+        <button className="btn btn-primary" onClick={props.onPlay} disabled={!props.project} title={props.project ? '运行/构建预览' : '未打开项目'}>
           {props.isPlaying ? I.stop : I.play}
-          {props.isPlaying ? 'Stop' : 'Play'}
+          {props.isPlaying ? '停止' : '运行'}
         </button>
-        <button className="btn" disabled title="Coming soon">
+        <button className="btn" disabled title="即将支持">
           {I.build}
-          Build
+          构建
         </button>
         <div style={{ width: 1, height: 18, background: 'var(--line)', margin: '0 2px' }} />
         <button
           className="btn btn-icon btn-ghost"
-          title={props.theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+          title={props.theme === 'dark' ? '切换到浅色' : '切换到深色'}
           onClick={props.onToggleTheme}
         >
           {props.theme === 'dark' ? I.sun : I.moon}
@@ -89,12 +89,12 @@ export function Header(props: Props) {
         <button
           className="btn btn-sm btn-ghost"
           style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}
-          title={`Density · ${props.density} (click to cycle)`}
+          title={`密度 · ${props.density}（点击切换）`}
           onClick={props.onCycleDensity}
         >
           {props.density.slice(0, 1).toUpperCase()}
         </button>
-        <button className="btn btn-icon btn-ghost" title="More">
+        <button className="btn btn-icon btn-ghost" title="更多">
           {I.more}
         </button>
       </div>
@@ -138,14 +138,14 @@ function ProjectSwitcher(props: {
           <rect x="2" y="2" width="10" height="10" rx="2" fill="oklch(0.78 0.16 var(--accent-h) / 0.18)" stroke="oklch(0.78 0.16 var(--accent-h))" strokeWidth="1" />
           <circle cx="7" cy="7" r="2" fill="oklch(0.78 0.16 var(--accent-h))" />
         </svg>
-        <span className="label">Project</span>
-        <span className="name">{props.project?.name ?? 'none'}</span>
+        <span className="label">项目</span>
+        <span className="name">{props.project?.name ?? '未选择'}</span>
         <span className="caret">{I.caret}</span>
       </button>
       {open && (
         <div className="proj-dropdown">
           {props.projects.length === 0 && (
-            <div className="proj-dropdown-empty">No recent projects</div>
+            <div className="proj-dropdown-empty">暂无最近项目</div>
           )}
           {props.projects.map((p) => {
             const confirming = confirmingPath === p.path;
@@ -174,8 +174,8 @@ function ProjectSwitcher(props: {
                       className={`proj-dropdown-delete ${confirming ? 'confirming' : ''}`}
                       title={
                         confirming
-                          ? 'Click again to confirm. Files on disk are NOT deleted.'
-                          : 'Remove from OGF (files on disk are kept)'
+                          ? '再次点击确认。不会删除磁盘文件。'
+                          : '从 OGF 列表移除（保留磁盘文件）'
                       }
                       onClick={(e) => {
                         e.stopPropagation();
@@ -187,7 +187,7 @@ function ProjectSwitcher(props: {
                         }
                       }}
                     >
-                      {confirming ? 'remove?' : '×'}
+                      {confirming ? '确认移除?' : '×'}
                     </button>
                   )}
                 </div>
@@ -202,7 +202,7 @@ function ProjectSwitcher(props: {
               setOpen(false);
             }}
           >
-            + Open folder…
+            + 打开文件夹…
           </div>
         </div>
       )}

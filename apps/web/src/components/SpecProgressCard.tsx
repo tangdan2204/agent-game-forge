@@ -131,12 +131,12 @@ export function SpecProgressCard(props: Props) {
         type="button"
         className="spec-progress-head spec-progress-head-clickable"
         onClick={() => setCollapsed((v) => !v)}
-        title={collapsed ? 'Expand phase list' : 'Collapse phase list'}
+        title={collapsed ? '展开阶段列表' : '收起阶段列表'}
       >
         <span className="spec-progress-chev" aria-hidden>
           {collapsed ? '▸' : '▾'}
         </span>
-        <span className="spec-progress-title">{title ?? 'Spec progress'}</span>
+        <span className="spec-progress-title">{title ?? '规格进度'}</span>
         <span className="spec-progress-stat">
           {done} / {phases.length} ({pct}%)
         </span>

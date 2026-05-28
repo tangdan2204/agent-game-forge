@@ -136,20 +136,20 @@ function ConfirmDialog({ opts, onClose }: { opts: ConfirmOptions; onClose: (v: b
             {opts.danger ? I.warn : I.spark}
           </span>
           <span className="title">{opts.title}</span>
-          <button className="close" onClick={() => onClose(false)} title="Cancel (Esc)">{I.close}</button>
+          <button className="close" onClick={() => onClose(false)} title="取消 (Esc)">{I.close}</button>
         </div>
         {opts.body && <div className="ogf-confirm-body">{opts.body}</div>}
         <div className="ogf-confirm-foot">
           <span style={{ flex: 1 }} />
           <button className="btn btn-sm" onClick={() => onClose(false)}>
-            {opts.cancelLabel ?? 'Cancel'}
+            {opts.cancelLabel ?? '取消'}
           </button>
           <button
             className={`btn btn-sm ${opts.danger ? 'btn-danger' : 'btn-primary'}`}
             onClick={() => onClose(true)}
             autoFocus
           >
-            {opts.confirmLabel ?? 'Confirm'}
+            {opts.confirmLabel ?? '确认'}
           </button>
         </div>
       </div>
@@ -179,7 +179,7 @@ function ToastStack({
             {t.title && <div className="ogf-toast-title">{t.title}</div>}
             <div className="ogf-toast-body">{t.body}</div>
           </div>
-          <button className="ogf-toast-x" title="Dismiss">{I.close}</button>
+          <button className="ogf-toast-x" title="关闭">{I.close}</button>
         </div>
       ))}
     </div>

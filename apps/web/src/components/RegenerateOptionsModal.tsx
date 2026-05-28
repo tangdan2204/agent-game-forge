@@ -49,13 +49,13 @@ interface Props {
 }
 
 const ASPECTS: Array<{ value: RegenerateOptions['aspectRatio']; label: string }> = [
-  { value: 'same', label: 'Same as current' },
-  { value: '1:1', label: '1:1 (square)' },
+  { value: 'same', label: '与当前一致' },
+  { value: '1:1', label: '1:1（正方形）' },
   { value: '4:3', label: '4:3' },
   { value: '3:4', label: '3:4' },
   { value: '16:9', label: '16:9' },
   { value: '9:16', label: '9:16' },
-  { value: 'free', label: 'Free (let model pick)' },
+  { value: 'free', label: '自由（由模型决定）' },
 ];
 
 /** Walk the file tree to determine whether `relPath` lives in an
@@ -274,7 +274,7 @@ export function RegenerateOptionsModal(props: Props) {
           <span style={{ color: 'var(--accent)', flexShrink: 0 }}>{I.refresh}</span>
           <div className="modal-head-stack">
             <span className="title">
-              {packCtx.isPack ? `Regenerate ${packLabel}` : 'Regenerate sprite'}
+              {packCtx.isPack ? `重生成 ${packLabel}` : '重生成精灵'}
             </span>
             <span className="sub" title={packCtx.isPack ? packCtx.packDir ?? '' : props.relPath}>
               {packCtx.isPack ? packCtx.packDir : props.relPath}
@@ -287,16 +287,15 @@ export function RegenerateOptionsModal(props: Props) {
           <div className="regen-form">
             {packCtx.isPack && (
               <div className="regen-pack-disclosure">
-                <strong>This regenerates the entire animation pack.</strong>{' '}
+                <strong>这会重生成整个动画包。</strong>{' '}
                 <span className="muted">
-                  All {packCtx.packFiles.length} files in <code>{packCtx.packDir}/</code>{' '}
-                  swap atomically when you apply.
+                  你点击应用后，<code>{packCtx.packDir}/</code> 下的 {packCtx.packFiles.length} 个文件会原子替换。
                   {packCtx.siblingActions.length > 0 && (
                     <>
                       {' '}
-                      Other actions of the same entity (
+                      同一实体的其他动作（
                       {packCtx.siblingActions.map((a) => a.name).join(', ')})
-                      won't be touched.
+                      不会被修改。
                     </>
                   )}
                 </span>
@@ -306,11 +305,11 @@ export function RegenerateOptionsModal(props: Props) {
             {/* The two things that actually matter for most regenerates:
                 what should change, and which sibling sprites to match. */}
             <label className="regen-form-row regen-form-row-stack">
-              <span>What should change?</span>
+              <span>希望调整什么？</span>
               <textarea
                 value={hint}
                 onChange={(e) => setHint(e.target.value)}
-                placeholder="Optional. e.g. 'more aggressive — bigger swings'. Leave blank for a fresh take with the same intent."
+                placeholder="可选，例如：动作更凶、更大幅挥动。留空则在保留原意下生成新版本。"
                 rows={3}
                 autoFocus
               />
@@ -324,13 +323,13 @@ export function RegenerateOptionsModal(props: Props) {
               />
               <span>
                 {packCtx.isPack
-                  ? 'Match style of other actions of this entity'
-                  : 'Match style of sibling sprites in the same folder'}
+                  ? '匹配该实体其他动作的风格'
+                  : '匹配同目录兄弟精灵的风格'}
                 {scanLoading ? (
-                  <span className="muted mono" style={{ marginLeft: 6 }}>scanning…</span>
+                  <span className="muted mono" style={{ marginLeft: 6 }}>扫描中…</span>
                 ) : (
                   <span className="pill" style={{ marginLeft: 6 }}>
-                    {referenceFiles.length} found
+                    找到 {referenceFiles.length} 个
                   </span>
                 )}
               </span>
@@ -342,7 +341,7 @@ export function RegenerateOptionsModal(props: Props) {
                   <li key={s} className="mono">{s}</li>
                 ))}
                 {referenceFiles.length > 6 && (
-                  <li className="muted mono">… and {referenceFiles.length - 6} more</li>
+                  <li className="muted mono">… 另有 {referenceFiles.length - 6} 个</li>
                 )}
               </ul>
             )}
@@ -357,23 +356,23 @@ export function RegenerateOptionsModal(props: Props) {
                 className={`regen-mode-btn ${mode === 'auto' ? 'active' : ''}`}
                 onClick={() => setMode('auto')}
               >
-                Quick
-                <span className="muted">agent decides layout</span>
+                快速
+                <span className="muted">由智能体决定布局</span>
               </button>
               <button
                 type="button"
                 className={`regen-mode-btn ${mode === 'manual' ? 'active' : ''}`}
                 onClick={() => setMode('manual')}
               >
-                Manual
-                <span className="muted">I'll set frames / grid / fps</span>
+                手动
+                <span className="muted">我来设置帧数/网格/FPS</span>
               </button>
             </div>
 
             {mode === 'manual' && (
               <div className="regen-manual-block">
                 <label className="regen-form-row">
-                  <span>Aspect ratio</span>
+                  <span>长宽比</span>
                   <select
                     value={aspectRatio}
                     onChange={(e) => setAspectRatio(e.target.value as RegenerateOptions['aspectRatio'])}
@@ -387,7 +386,7 @@ export function RegenerateOptionsModal(props: Props) {
                 </label>
 
                 <div className="regen-form-row">
-                  <span>Frames</span>
+                  <span>帧数</span>
                   <div className="regen-frame-controls">
                     <input
                       type="number"
@@ -396,7 +395,7 @@ export function RegenerateOptionsModal(props: Props) {
                       onChange={(e) => applyFrames(Number(e.target.value))}
                       style={{ width: 64 }}
                     />
-                    <span className="regen-form-divider">in</span>
+                    <span className="regen-form-divider">分布在</span>
                     <input
                       type="number"
                       min={1}
@@ -416,15 +415,15 @@ export function RegenerateOptionsModal(props: Props) {
                       type="button"
                       className="btn btn-sm"
                       onClick={autoSuggest}
-                      title="Suggest a grid that matches frame count"
+                      title="自动建议与帧数匹配的网格"
                     >
-                      auto
+                      自动
                     </button>
                   </div>
                 </div>
                 {gridMismatch && (
                   <div className="regen-form-warn">
-                    {I.warn} cols × rows ({cols * rows}) doesn't match frames ({frames}).
+                    {I.warn} cols × rows ({cols * rows}) 与帧数 ({frames}) 不一致。
                   </div>
                 )}
 
@@ -445,9 +444,9 @@ export function RegenerateOptionsModal(props: Props) {
         </div>
 
         <div className="modal-foot">
-          <button className="btn btn-sm" onClick={props.onCancel}>Cancel</button>
+          <button className="btn btn-sm" onClick={props.onCancel}>取消</button>
           <button className="btn btn-sm btn-primary" onClick={submit}>
-            {I.refresh} Regenerate
+            {I.refresh} 重生成
           </button>
         </div>
       </div>

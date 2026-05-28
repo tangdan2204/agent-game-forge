@@ -24,9 +24,9 @@ export function PendingChangesModal(props: Props) {
       >
         <div className="modal-head">
           <span style={{ color: 'var(--accent)' }}>{I.scissors}</span>
-          <span className="title">Pending slicing changes</span>
+          <span className="title">待处理切片变更</span>
           <span className="sub">
-            {props.pending.length} sheet{props.pending.length === 1 ? '' : 's'} edited locally · not yet applied to engine
+            已在本地编辑 {props.pending.length} 张图集 · 尚未应用到引擎
           </span>
           <button className="close" onClick={props.onClose}>{I.close}</button>
         </div>
@@ -34,48 +34,48 @@ export function PendingChangesModal(props: Props) {
         <div className="pending-list">
           {props.pending.length === 0 && (
             <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-3)' }}>
-              No pending changes.
+              暂无待处理变更。
             </div>
           )}
           {props.pending.map((p) => (
             <div key={p.sidecarPath} className="pending-row">
               <div className="pending-row-head">
                 <code className="pending-source">{p.sourcePath}</code>
-                <span className="pill" title="Slicing in OGF metadata">
+                <span className="pill" title="OGF 元数据中的切片配置">
                   {p.cols}×{p.rows} · {p.fps}fps · {p.anchor}
                 </span>
                 <button
                   className="btn btn-sm btn-ghost"
-                  title="Discard this change (delete its .ogf-slice.json sidecar)"
+                  title="丢弃此变更（删除对应 .ogf-slice.json 侧车文件）"
                   onClick={async () => {
                     const ok = await askConfirm({
-                      title: 'Discard pending slicing?',
+                      title: '丢弃待处理切片变更？',
                       body: p.sourcePath,
                       danger: true,
-                      confirmLabel: 'Discard',
+                      confirmLabel: '丢弃',
                     });
                     if (ok) props.onDiscardOne(p.sidecarPath);
                   }}
                 >
-                  {I.close} discard
+                  {I.close} 丢弃
                 </button>
               </div>
               <dl className="kv" style={{ marginTop: 8, gridTemplateColumns: '90px 1fr' }}>
-                <dt>Frame</dt>
+                <dt>帧</dt>
                 <dd>
                   {p.frameW ?? '?'} × {p.frameH ?? '?'}
                   {(p.padding > 0 || p.offsetX !== 0 || p.offsetY !== 0) && (
                     <>
-                      {' · '}padding {p.padding}, offset ({p.offsetX}, {p.offsetY})
+                      {' · '}内边距 {p.padding}，偏移 ({p.offsetX}, {p.offsetY})
                     </>
                   )}
                 </dd>
-                <dt>Sidecar</dt>
+                <dt>侧车文件</dt>
                 <dd style={{ color: 'var(--ink-3)', fontSize: 11 }}>{p.sidecarPath}</dd>
-                <dt>Used in</dt>
+                <dt>引用位置</dt>
                 <dd>
                   {p.usages.length === 0 ? (
-                    <span style={{ color: 'var(--ink-3)' }}>(no references found)</span>
+                    <span style={{ color: 'var(--ink-3)' }}>(未找到引用)</span>
                   ) : (
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {p.usages.map((u, i) => (
@@ -97,8 +97,8 @@ export function PendingChangesModal(props: Props) {
         <div className="modal-foot">
           <span className="info">
             <span style={{ color: 'var(--ink-2)' }}>
-              Applying via Codex: builds one prompt covering all entries and sends it to the agent.
-              {' '}You review and Send.
+              通过 Codex 应用：会自动生成覆盖全部条目的提示词并发送给智能体，
+              {' '}你只需审核后发送。
             </span>
           </span>
           <span className="grow" />
@@ -106,19 +106,19 @@ export function PendingChangesModal(props: Props) {
             className="btn btn-sm"
             onClick={props.onClearAll}
             disabled={props.pending.length === 0}
-            title="Discard all pending changes (deletes .ogf-slice.json sidecars; underlying Godot files untouched)"
+            title="丢弃全部待处理变更（删除 .ogf-slice.json 侧车文件，不改动底层 Godot 文件）"
           >
-            {I.retry} Revert all
+            {I.retry} 全部还原
           </button>
           <button className="btn btn-sm" onClick={props.onClose}>
-            Cancel
+            取消
           </button>
           <button
             className="btn btn-sm btn-primary"
             disabled={props.pending.length === 0}
             onClick={() => props.onApplyAll(buildBatchPrompt(props.pending, props.engine))}
           >
-            {I.spark} Apply all via Codex
+            {I.spark} 通过 Codex 全部应用
           </button>
         </div>
       </div>
@@ -136,38 +136,38 @@ export function buildBatchPrompt(
   // a constant in src/.
   const updateLine =
     engine === 'godot'
-      ? 'For each, please update the relevant Godot config (typically `frame_cols` / `frame_rows` / `animation_fps` in scenes, scripts, or `.tres` files) so the game uses the new values.'
+      ? '请逐项更新对应 Godot 配置（通常是场景、脚本或 `.tres` 中的 `frame_cols` / `frame_rows` / `animation_fps`），让游戏使用新参数。'
       : engine === 'web'
-        ? 'For each, please update the web project so the game uses the new values. Sheets are typically sliced via fields like `cols` / `rows` / `fps` / `frameWidth` / `frameHeight` / `anchor` / `offset` in a `data/*.json` catalog or a constant in `src/*.js` (preserve existing field names — don\'t rename them).'
-        : 'For each, please update the project so the game uses the new values. Look at the per-sheet usages below to find the slicing config and update cols / rows / fps / anchor / offset to match.';
+        ? '请逐项更新 Web 项目配置，让游戏使用新参数。图集切片通常写在 `data/*.json` 或 `src/*.js` 常量中（如 `cols` / `rows` / `fps` / `frameWidth` / `frameHeight` / `anchor` / `offset`），请保持原字段名不要重命名。'
+        : '请逐项更新项目配置，让游戏使用新参数。根据下方每张图的引用位置找到切片配置并同步 cols / rows / fps / anchor / offset。';
   const lines: string[] = [
-    '# Apply pending sprite slicing changes',
+    '# 应用待处理精灵切片变更',
     '',
-    `I have ${pending.length} sprite sheet${pending.length === 1 ? '' : 's'} whose slicing config was edited locally in OGF.`,
+    `我在 OGF 中本地修改了 ${pending.length} 张精灵图集的切片配置。`,
     updateLine,
     '',
-    'Plan first (list the exact edits you would make). After I confirm, apply them.',
-    'Once applied successfully, delete the `.ogf-slice.json` sidecar for that sheet so OGF stops showing it as pending.',
+    '请先给出计划（逐条列出将修改的文件和字段），待我确认后再应用。',
+    '应用成功后，请删除对应图集的 `.ogf-slice.json` 侧车文件，避免 OGF 继续显示为待处理。',
     '',
-    '## Pending changes',
+    '## 待处理变更',
     '',
   ];
 
   pending.forEach((p, i) => {
     lines.push(`### ${i + 1}. \`${p.sourcePath}\``);
     lines.push('');
-    const detail = `**${p.cols} × ${p.rows}** at ${p.fps} fps · anchor: ${p.anchor}`;
+    const detail = `**${p.cols} × ${p.rows}**，${p.fps} fps · 锚点：${p.anchor}`;
     const extra = p.padding > 0 || p.offsetX !== 0 || p.offsetY !== 0
-      ? ` · padding ${p.padding}, offset (${p.offsetX}, ${p.offsetY})`
+      ? ` · 内边距 ${p.padding}，偏移 (${p.offsetX}, ${p.offsetY})`
       : '';
-    lines.push(`Target slicing: ${detail}${extra}`);
+    lines.push(`目标切片：${detail}${extra}`);
     if (p.frameW && p.frameH) {
-      lines.push(`Frame size: ${p.frameW} × ${p.frameH}px`);
+      lines.push(`单帧尺寸：${p.frameW} × ${p.frameH}px`);
     }
-    lines.push(`Sidecar to delete after applying: \`${p.sidecarPath}\``);
+    lines.push(`应用后需删除的侧车文件：\`${p.sidecarPath}\``);
     if (p.usages.length > 0) {
       lines.push('');
-      lines.push('References:');
+      lines.push('引用位置：');
       for (const u of p.usages) {
         lines.push(`- \`${u.file}:${u.line}\`  ${u.snippet}`);
       }

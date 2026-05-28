@@ -59,10 +59,10 @@ export function Sidebar(props: Props) {
       : 'error';
   const stateLabel =
     agentState === 'ok'
-      ? 'Codex ready'
+      ? 'Codex 就绪'
       : agentState === 'error'
-        ? 'Codex offline'
-        : 'Detecting…';
+        ? 'Codex 离线'
+        : '检测中…';
 
   // Project-scoped search. State is local to this Sidebar — empty when there
   // is no project, reset when switching projects (re-render of <Sidebar> for
@@ -138,8 +138,8 @@ export function Sidebar(props: Props) {
           type="button"
           className="icon-btn side-top-open"
           onClick={props.onOpenProject}
-          title="Open project folder…"
-          aria-label="Open project folder"
+          title="打开项目文件夹…"
+          aria-label="打开项目文件夹"
         >
           {I.plus}
         </button>
@@ -149,16 +149,16 @@ export function Sidebar(props: Props) {
           The user picked "toggle between two views" over a Files lane:
           each view stays uncluttered. */}
       {props.project && (
-        <div className="side-view-toggle" role="tablist" aria-label="Sidebar view">
+        <div className="side-view-toggle" role="tablist" aria-label="侧栏视图">
           <button
             type="button"
             role="tab"
             aria-selected={view === 'grouped'}
             className={`side-view-btn ${view === 'grouped' ? 'active' : ''}`}
             onClick={() => setView('grouped')}
-            title="Group by entity & scene"
+            title="按实体和场景分组"
           >
-            Grouped
+            分组
           </button>
           <button
             type="button"
@@ -166,9 +166,9 @@ export function Sidebar(props: Props) {
             aria-selected={view === 'files'}
             className={`side-view-btn ${view === 'files' ? 'active' : ''}`}
             onClick={() => setView('files')}
-            title="Raw file tree"
+            title="原始文件树"
           >
-            Files
+            文件
           </button>
         </div>
       )}
@@ -182,7 +182,7 @@ export function Sidebar(props: Props) {
             ref={searchInputRef}
             type="text"
             className="side-search-input"
-            placeholder="Search files…"
+            placeholder="搜索文件…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={onSearchKey}
@@ -198,8 +198,8 @@ export function Sidebar(props: Props) {
                 setSearch('');
                 searchInputRef.current?.focus();
               }}
-              title="Clear (Esc)"
-              aria-label="Clear search"
+              title="清空 (Esc)"
+              aria-label="清空搜索"
             >
               ×
             </button>
@@ -251,7 +251,7 @@ export function Sidebar(props: Props) {
         <button
           className="agent-pill"
           data-state={agentState}
-          title={props.agent?.path ?? 'Codex agent status'}
+          title={props.agent?.path ?? 'Codex 代理状态'}
         >
           <span className="dot" />
           <span className="lbl">{stateLabel}</span>
@@ -264,14 +264,14 @@ export function Sidebar(props: Props) {
         <span className="grow" />
         <button
           className="icon-btn"
-          title={props.theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+          title={props.theme === 'dark' ? '切换到浅色' : '切换到深色'}
           onClick={props.onToggleTheme}
         >
           {props.theme === 'dark' ? I.sun : I.moon}
         </button>
         <button
           className="icon-btn"
-          title={`Density · ${props.density} (click to cycle)`}
+          title={`密度 · ${props.density}（点击切换）`}
           onClick={props.onCycleDensity}
           style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}
         >
@@ -312,18 +312,18 @@ function ProjectSwitcher(props: {
         type="button"
         className="nav-item proj-trigger"
         onClick={() => setOpen((v) => !v)}
-        title={props.project ? `${props.project.path}\nEngine: ${props.project.engine}` : undefined}
+        title={props.project ? `${props.project.path}\n引擎: ${props.project.engine}` : undefined}
       >
         <svg className="ico" width="14" height="14" viewBox="0 0 14 14" fill="none">
           <rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" />
           <circle cx="7" cy="7" r="2" fill="currentColor" />
         </svg>
-        <span className="proj-trigger-name">{props.project?.name ?? 'No project'}</span>
+        <span className="proj-trigger-name">{props.project?.name ?? '未打开项目'}</span>
         {props.project && (
           <span
             className="proj-trigger-engine"
             data-engine={props.project.engine}
-            aria-label={`Engine: ${props.project.engine}`}
+            aria-label={`引擎: ${props.project.engine}`}
           >
             {props.project.engine}
           </span>
@@ -333,7 +333,7 @@ function ProjectSwitcher(props: {
       {open && (
         <div className="proj-dropdown">
           {props.projects.length === 0 && (
-            <div className="proj-dropdown-empty">No recent projects</div>
+            <div className="proj-dropdown-empty">暂无最近项目</div>
           )}
           {props.projects.map((p) => {
             const confirming = confirmingPath === p.path;
@@ -361,8 +361,8 @@ function ProjectSwitcher(props: {
                       className={`proj-dropdown-delete ${confirming ? 'confirming' : ''}`}
                       title={
                         confirming
-                          ? 'Click again to confirm. Files on disk are NOT deleted.'
-                          : 'Remove from OGF (files on disk are kept)'
+                          ? '再次点击确认。不会删除磁盘文件。'
+                          : '从 OGF 列表移除（保留磁盘文件）'
                       }
                       onClick={(e) => {
                         e.stopPropagation();
@@ -374,7 +374,7 @@ function ProjectSwitcher(props: {
                         }
                       }}
                     >
-                      {confirming ? 'remove?' : '×'}
+                      {confirming ? '确认移除?' : '×'}
                     </button>
                   )}
                 </div>

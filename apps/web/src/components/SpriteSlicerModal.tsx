@@ -55,7 +55,7 @@ export function SpriteSlicerModal(props: Props) {
       .then((r) => {
         if (cancelled) return;
         if (r.kind !== 'image' || !r.base64) {
-          setImgError('Not an image');
+          setImgError('不是图片文件');
           return;
         }
         const ext = props.imageRelPath.split('.').pop()?.toLowerCase() ?? 'png';
@@ -117,7 +117,7 @@ export function SpriteSlicerModal(props: Props) {
       setSavedAt(Date.now());
       props.onSaved?.(metadata);
     } catch (err) {
-      notify({ kind: 'error', title: 'Could not save slicing', body: err instanceof Error ? err.message : String(err) });
+      notify({ kind: 'error', title: '无法保存切片配置', body: err instanceof Error ? err.message : String(err) });
     } finally {
       setSaving(false);
     }
@@ -136,7 +136,7 @@ export function SpriteSlicerModal(props: Props) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <span style={{ color: 'var(--accent)' }}>{I.scissors}</span>
-          <span className="title">Sprite frame editor</span>
+          <span className="title">精灵帧编辑器</span>
           <span className="sub">
             {props.imageRelPath} · {naturalW}×{naturalH}
           </span>
@@ -146,7 +146,7 @@ export function SpriteSlicerModal(props: Props) {
         <div className="modal-body">
           <div className="modal-canvas">
             {imgError && <div className="msg-sys err">{imgError}</div>}
-            {!imgUrl && !imgError && <div className="muted mono">Loading image…</div>}
+            {!imgUrl && !imgError && <div className="muted mono">图片加载中…</div>}
             {imgUrl && (
               <div
                 style={{
@@ -228,41 +228,41 @@ export function SpriteSlicerModal(props: Props) {
 
           <div className="modal-side">
             <div>
-              <h5>Slice</h5>
+              <h5>切片</h5>
               <div className="field">
-                <label>Columns <b>{cols}</b></label>
+                <label>列数 <b>{cols}</b></label>
                 <input type="range" min={1} max={16} value={cols} onChange={(e) => setCols(+e.target.value)} />
               </div>
               <div className="field">
-                <label>Rows <b>{rows}</b></label>
+                <label>行数 <b>{rows}</b></label>
                 <input type="range" min={1} max={16} value={rows} onChange={(e) => setRows(+e.target.value)} />
               </div>
               <div className="field-row">
-                <div className="field"><label>Frame W <b>{Math.round(fW)}px</b></label></div>
-                <div className="field"><label>Frame H <b>{Math.round(fH)}px</b></label></div>
+                <div className="field"><label>单帧宽 <b>{Math.round(fW)}px</b></label></div>
+                <div className="field"><label>单帧高 <b>{Math.round(fH)}px</b></label></div>
               </div>
             </div>
 
             <div>
-              <h5>Offset & Padding</h5>
+              <h5>偏移与内边距</h5>
               <div className="field">
-                <label>Padding <b>{pad}px</b></label>
+                <label>内边距 <b>{pad}px</b></label>
                 <input type="range" min={0} max={16} value={pad} onChange={(e) => setPad(+e.target.value)} />
               </div>
               <div className="field-row">
                 <div className="field">
-                  <label>Offset X <b>{offX}px</b></label>
+                  <label>X 偏移 <b>{offX}px</b></label>
                   <input type="range" min={-32} max={32} value={offX} onChange={(e) => setOffX(+e.target.value)} />
                 </div>
                 <div className="field">
-                  <label>Offset Y <b>{offY}px</b></label>
+                  <label>Y 偏移 <b>{offY}px</b></label>
                   <input type="range" min={-32} max={32} value={offY} onChange={(e) => setOffY(+e.target.value)} />
                 </div>
               </div>
             </div>
 
             <div>
-              <h5>Anchor</h5>
+              <h5>锚点</h5>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
                 {ANCHORS.map((a) => (
                   <button
@@ -279,7 +279,7 @@ export function SpriteSlicerModal(props: Props) {
             </div>
 
             <div>
-              <h5>Animation preview</h5>
+              <h5>动画预览</h5>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                 <div
                   style={{
@@ -318,7 +318,7 @@ export function SpriteSlicerModal(props: Props) {
                     <input type="range" min={1} max={24} value={fps} onChange={(e) => setFps(+e.target.value)} />
                   </div>
                   <div className="mono" style={{ fontSize: 11, color: 'var(--ink-2)' }}>
-                    frame {frame} / {totalFrames - 1}
+                    帧 {frame} / {totalFrames - 1}
                   </div>
                 </div>
               </div>
@@ -328,13 +328,13 @@ export function SpriteSlicerModal(props: Props) {
 
         <div className="modal-foot">
           <span className="info">
-            {totalFrames} frames · {Math.round(fW)}×{Math.round(fH)}px · {anchor}
-            {savedAt && <span style={{ marginLeft: 12, color: 'var(--green)' }}>✓ saved</span>}
+            {totalFrames} 帧 · {Math.round(fW)}×{Math.round(fH)}px · {anchor}
+            {savedAt && <span style={{ marginLeft: 12, color: 'var(--green)' }}>✓ 已保存</span>}
           </span>
           <span className="grow" />
-          <button className="btn btn-sm" onClick={props.onClose}>Cancel</button>
+          <button className="btn btn-sm" onClick={props.onClose}>取消</button>
           <button className="btn btn-sm" onClick={() => void save()} disabled={saving || !naturalW}>
-            {saving ? 'Saving…' : 'Save metadata'}
+            {saving ? '保存中…' : '保存元数据'}
           </button>
           {props.onAskCodex && (
             <button
@@ -350,9 +350,9 @@ export function SpriteSlicerModal(props: Props) {
                 props.onAskCodex?.(metadata);
                 props.onClose();
               }}
-              title="Save and ask Codex to apply this slicing to the engine config"
+              title="保存并让 Codex 将该切片配置应用到引擎配置"
             >
-              Save + Apply via Codex
+              保存并通过 Codex 应用
             </button>
           )}
         </div>

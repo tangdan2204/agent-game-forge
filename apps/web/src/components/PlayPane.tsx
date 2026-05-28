@@ -196,13 +196,13 @@ export function PlayPane(props: Props) {
       pushLine({
         channel: 'system',
         level: 'system',
-        text: `▶ Godot started\n  bin: ${d.bin ?? ''}\n  args: ${argLine}\n  scene: ${d.mainScene ?? '(use main_scene from project.godot)'}`,
+        text: `▶ Godot 已启动\n  程序: ${d.bin ?? ''}\n  参数: ${argLine}\n  场景: ${d.mainScene ?? '（使用 project.godot 的 main_scene）'}`,
       });
     } else if (e.type === 'error') {
       pushLine({
         channel: 'system',
         level: 'error',
-        text: `× ${(e.data as { message?: string }).message ?? 'unknown error'}`,
+        text: `× ${(e.data as { message?: string }).message ?? '未知错误'}`,
       });
     } else if (e.type === 'end') {
       flushBuffers();
@@ -234,7 +234,7 @@ export function PlayPane(props: Props) {
       pushLine({
         channel: 'system',
         level: 'error',
-        text: `× could not start: ${err instanceof Error ? err.message : String(err)}`,
+        text: `× 无法启动：${err instanceof Error ? err.message : String(err)}`,
       });
     }
   }
@@ -271,9 +271,9 @@ export function PlayPane(props: Props) {
     return (
       <div className="inspector">
         <div className="crumbs">
-          <span className="last">Play</span>
+          <span className="last">运行</span>
         </div>
-        <div className="play-empty muted">Detecting Godot…</div>
+        <div className="play-empty muted">正在检测 Godot…</div>
       </div>
     );
   }
@@ -282,28 +282,26 @@ export function PlayPane(props: Props) {
     return (
       <div className="inspector">
         <div className="crumbs">
-          <span className="last">Play</span>
-          <span className="badge-dim" style={{ color: 'var(--red)' }}>godot not found</span>
+          <span className="last">运行</span>
+          <span className="badge-dim" style={{ color: 'var(--red)' }}>未找到 Godot</span>
         </div>
         <div className="play-empty">
           <div className="play-empty-card">
-            <h3>Godot binary not detected</h3>
+            <h3>未检测到 Godot 可执行文件</h3>
             <p className="muted">
-              OGF looked on PATH and common Windows install locations but couldn't find a Godot
-              executable. You can either:
+              OGF 已检查 PATH 和常见 Windows 安装路径，但未找到 Godot 可执行文件。你可以：
             </p>
             <ol className="play-empty-list">
               <li>
-                Set the <span className="kbd-inline">OGF_GODOT</span> environment variable to your
-                Godot exe path, then restart the daemon
+                将环境变量 <span className="kbd-inline">OGF_GODOT</span> 设置为 Godot 可执行文件路径，然后重启 daemon
               </li>
               <li>
-                Add Godot to your <span className="kbd-inline">PATH</span>
+                将 Godot 加入 <span className="kbd-inline">PATH</span>
               </li>
               <li>
-                Install Godot to a folder under <span className="kbd-inline">D:\</span> /{' '}
+                按默认解压目录将 Godot 安装到 <span className="kbd-inline">D:\</span> /{' '}
                 <span className="kbd-inline">C:\</span> /{' '}
-                <span className="kbd-inline">~\Downloads</span> with the default extracted layout
+                <span className="kbd-inline">~\Downloads</span> 下
               </li>
             </ol>
             <button
@@ -316,7 +314,7 @@ export function PlayPane(props: Props) {
                   .finally(() => setGodotLoading(false));
               }}
             >
-              Re-check
+              重新检测
             </button>
           </div>
         </div>
@@ -327,7 +325,7 @@ export function PlayPane(props: Props) {
   return (
     <div className="inspector">
       <div className="crumbs">
-        <span className="last">Play</span>
+        <span className="last">运行</span>
         <span className="badge-dim" title={godot.path}>
           {godot.version?.split('.').slice(0, 3).join('.')}
         </span>
@@ -341,37 +339,37 @@ export function PlayPane(props: Props) {
             className="btn btn-sm"
             data-active={filter === 'all'}
             onClick={() => setFilter('all')}
-            title="Show all output"
+            title="显示全部输出"
           >
-            all
+            全部
           </button>
           <button
             className="btn btn-sm"
             data-active={filter === 'errors'}
             onClick={() => setFilter('errors')}
-            title="Show errors and warnings only"
+            title="仅显示错误和警告"
           >
-            errors{lastError ? ' ●' : ''}
+            错误{lastError ? ' ●' : ''}
           </button>
-          <button className="btn btn-sm btn-ghost" onClick={clear} title="Clear output">
-            clear
+          <button className="btn btn-sm btn-ghost" onClick={clear} title="清空输出">
+            清空
           </button>
           {running ? (
             <button
               className="btn btn-sm"
               style={{ color: 'var(--red)' }}
               onClick={() => void stop()}
-              title="Stop Godot"
+              title="停止 Godot"
             >
-              {I.stop} stop
+              {I.stop} 停止
             </button>
           ) : (
             <button
               className="btn btn-sm btn-primary"
               onClick={() => void play()}
-              title="Run the project"
+              title="运行项目"
             >
-              {I.play} play
+              {I.play} 运行
             </button>
           )}
         </span>
@@ -379,7 +377,7 @@ export function PlayPane(props: Props) {
       <div ref={consoleRef} className="play-console" onScroll={onScroll}>
         {visibleLines.length === 0 ? (
           <div className="play-empty muted">
-            {running ? 'Waiting for output…' : 'Press play to launch Godot.'}
+            {running ? '等待输出中…' : '点击运行以启动 Godot。'}
           </div>
         ) : (
           visibleLines.map((l) => (
@@ -415,7 +413,7 @@ function PlayLine({
       {line.text.slice(0, idx)}
       <button
         className="play-jump"
-        title={`Jump to ${line.jump.relPath}:${line.jump.line}`}
+        title={`跳转到 ${line.jump.relPath}:${line.jump.line}`}
         onClick={() => onJumpTo?.(line.jump!.relPath, line.jump!.line)}
       >
         {m[0]}
@@ -466,32 +464,32 @@ function WebPlayPane({ projectPath }: { projectPath: string }) {
   return (
     <div className="inspector">
       <div className="crumbs">
-        <span className="last">Play</span>
+        <span className="last">运行</span>
         <span className="badge-dim">web</span>
         <span className="actions">
           <button
             className="btn btn-sm btn-ghost"
             onClick={() => setReloadTick((n) => n + 1)}
             disabled={!running}
-            title="Reload iframe"
+            title="重载 iframe"
           >
-            ↻ reload
+            ↻ 重载
           </button>
           <button
             className="btn btn-sm btn-ghost"
             onClick={() => window.open(src, '_blank')}
-            title="Open in a new browser tab"
+            title="在新浏览器标签页打开"
           >
-            ↗ open in tab
+            ↗ 新标签打开
           </button>
           {running ? (
             <button
               className="btn btn-sm"
               style={{ color: 'var(--red)' }}
               onClick={() => setRunning(false)}
-              title="Stop the game (unmount iframe)"
+              title="停止游戏（卸载 iframe）"
             >
-              {I.stop} stop
+              {I.stop} 停止
             </button>
           ) : (
             <button
@@ -503,9 +501,9 @@ function WebPlayPane({ projectPath }: { projectPath: string }) {
                 // the effect above.
                 e.currentTarget.blur();
               }}
-              title="Run the project in an iframe"
+              title="在 iframe 中运行项目"
             >
-              {I.play} play
+              {I.play} 运行
             </button>
           )}
         </span>
@@ -517,11 +515,11 @@ function WebPlayPane({ projectPath }: { projectPath: string }) {
             key={reloadTick}
             src={src}
             className="web-play-frame"
-            title="Project preview"
+            title="项目预览"
             sandbox="allow-scripts allow-same-origin allow-modals"
           />
         ) : (
-          <div className="play-empty muted">Press play to launch the web project.</div>
+          <div className="play-empty muted">点击运行以启动 Web 项目。</div>
         )}
       </div>
     </div>
